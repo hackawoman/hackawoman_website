@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 820" preserveAspectRatio="none">
+  <defs>
+    <radialGradient id="glow" cx="58%" cy="20%" r="55%">
+      <stop offset="0" stop-color="#6d1799" stop-opacity=".95"/>
+      <stop offset=".48" stop-color="#4c0b6f" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#321a28" stop-opacity=".2"/>
+    </radialGradient>
+    <pattern id="dots" width="92" height="92" patternUnits="userSpaceOnUse">
+      <circle cx="8" cy="8" r="2.5" fill="#ffffff" opacity=".1"/>
+      <circle cx="72" cy="44" r="1.8" fill="#ff6a3b" opacity=".15"/>
+    </pattern>
+  </defs>
+  <rect width="1440" height="820" fill="url(#glow)"/>
+  <rect width="1440" height="820" fill="url(#dots)"/>
+  <g opacity=".14" fill="none" stroke="#ffffff" stroke-width="1.6">
+    <path d="M92 530 226 402l155 84 128-220 164 92 112-184 171 107 137-96"/>
+    <path d="M760 548 900 402l134 64 126-178 160 96"/>
+    <path d="M168 180 332 126l162 96 124-80"/>
+  </g>
+</svg>
