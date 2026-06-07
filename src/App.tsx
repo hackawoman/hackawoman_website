@@ -22,6 +22,9 @@ import logoNavbar from "./assets/brand/logoNavbar.png";
 import logoPlexus from "./assets/brand/logoPlexus.png";
 import logoSecretaria from "./assets/brand/logoSecretaria.png";
 import logoTechwoman from "./assets/brand/logoTechwoman.png";
+import compromissoIcon from "./assets/icons/compromisso.png";
+import missaoIcon from "./assets/icons/missao.png";
+import visaoIcon from "./assets/icons/visao.png";
 
 type Pillar = {
   number: string;
@@ -67,37 +70,33 @@ const pillars: Pillar[] = [
   {
     number: "01",
     title: "Inovação",
-    description: "Criatividade e busca constante por novas soluções.",
+    description: "Estimular a criatividade e a busca constante por novas soluções.",
   },
   {
     number: "02",
     title: "Colaboração",
-    description: "Construção coletiva e troca de conhecimentos.",
+    description: "Acreditar na construção coletiva e na troca de conhecimentos.",
   },
   {
     number: "03",
     title: "Inclusão",
-    description: "Diversidade, equidade e oportunidades para todas.",
+    description: "Promover diversidade, equidade e oportunidades para todos.",
   },
   {
     number: "04",
     title: "Excelência",
-    description: "Qualidade, responsabilidade e compromisso.",
+    description: "Atuar com qualidade, responsabilidade e compromisso em cada iniciativa.",
   },
   {
     number: "05",
-    title: "Ética",
-    description: "Integridade e respeito em cada ação.",
+    title: "Ética e Transparência",
+    description: "Conduzir ações com integridade, clareza e respeito.",
   },
   {
     number: "06",
-    title: "Impacto social",
-    description: "Projetos que geram benefícios para a sociedade.",
-  },
-  {
-    number: "07",
-    title: "Aprendizado",
-    description: "Evolução constante de pessoas e organizações.",
+    title: "Impacto e Aprendizado",
+    description:
+      "Gerar benefícios reais para a sociedade enquanto incentivamos a evolução contínua.",
   },
 ];
 
@@ -105,14 +104,17 @@ const principles = [
   {
     title: "Missão",
     text: "Promover inovação e desenvolvimento por meio das tecnologias, criando oportunidades e gerando impacto positivo em um ecossistema inclusivo e sustentável.",
+    icon: missaoIcon,
   },
   {
     title: "Visão",
     text: "Ser referência em inovação tecnológica, conectando talentos e transformando ideias em oportunidades, tornando a tecnologia acessível para gerar progresso e inclusão.",
+    icon: visaoIcon,
   },
   {
     title: "Compromisso",
     text: "Promover talentos, inovação, conectando pessoas para gerar impacto. Acolhemos e capacitamos como base para formar lideranças e impulsionar o desenvolvimento social e econômico.",
+    icon: compromissoIcon,
   },
 ];
 
@@ -344,41 +346,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let touchStartY = 0;
-    const activeListenerOptions: AddEventListenerOptions = { passive: false };
-
-    const isAtPageTop = () => window.scrollY <= 0;
-
-    const blockWheelAboveTop = (event: WheelEvent) => {
-      if (isAtPageTop() && event.deltaY < 0) {
-        event.preventDefault();
-      }
-    };
-
-    const rememberTouchStart = (event: TouchEvent) => {
-      touchStartY = event.touches[0]?.clientY ?? 0;
-    };
-
-    const blockPullAboveTop = (event: TouchEvent) => {
-      const currentTouchY = event.touches[0]?.clientY ?? touchStartY;
-
-      if (isAtPageTop() && currentTouchY > touchStartY) {
-        event.preventDefault();
-      }
-    };
-
-    window.addEventListener("wheel", blockWheelAboveTop, activeListenerOptions);
-    window.addEventListener("touchstart", rememberTouchStart, activeListenerOptions);
-    window.addEventListener("touchmove", blockPullAboveTop, activeListenerOptions);
-
-    return () => {
-      window.removeEventListener("wheel", blockWheelAboveTop);
-      window.removeEventListener("touchstart", rememberTouchStart);
-      window.removeEventListener("touchmove", blockPullAboveTop);
-    };
-  }, []);
-
-  useEffect(() => {
     const updateScrollbarTheme = () => {
       const probeY = window.innerHeight * 0.5;
       const themedSections = Array.from(
@@ -428,7 +395,7 @@ function App() {
           <a href="#parceiros">Parceiros</a>
         </nav>
         <a className="nav-cta" href="#inscricao">
-          Inscreva-se já
+          <span>Inscreva-se já</span>
         </a>
       </header>
 
@@ -439,11 +406,13 @@ function App() {
           <HeroLogo />
           <p>Juntas, transformando o hoje e construindo o amanhã.</p>
           <a className="button button-primary" href="#inscricao">
-            Garanta sua vaga
+            <span>Garanta sua vaga</span>
           </a>
           <div className="hero-date">
             <strong>03 e 04 de Julho</strong>
-            <span>Centro de Informática UFPE</span>
+            <span>
+              <em>Centro de Informática UFPE</em>
+            </span>
           </div>
           <a className="scroll-cue" href="#sobre" aria-label="Ir para a próxima seção">
             <span />
@@ -473,7 +442,9 @@ function App() {
               <br />
               Realize.
             </strong>
-            <a href="#inscricao">Inscreva-se já</a>
+            <a href="#inscricao">
+              <span>Inscreva-se já</span>
+            </a>
           </div>
         </div>
       </section>
@@ -511,8 +482,10 @@ function App() {
         <div className="principle-grid">
           {principles.map((principle) => (
             <article className="principle-card" key={principle.title}>
-              <div className="principle-icon" aria-hidden="true" />
-              <h3>{principle.title}</h3>
+              <div className="principle-heading">
+                <img className="principle-icon" src={principle.icon} alt="" aria-hidden="true" />
+                <h3>{principle.title}</h3>
+              </div>
               <p>{principle.text}</p>
             </article>
           ))}
@@ -555,7 +528,7 @@ function App() {
             Seja uma das mulheres que vai transformar o ecossistema tech de Pernambuco.
           </p>
           <a className="button button-primary" href="mailto:contato@hackawoman.com">
-            Quero participar
+            <span>Quero participar</span>
           </a>
           <small>As vagas são limitadas, então garanta já a sua!</small>
           <HackaLogo compact />
