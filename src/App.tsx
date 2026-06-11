@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import decorBranco from "./assets/decor/quadradinhos-branco.png";
 import decorCinza from "./assets/decor/quadradinhos-cinza.png";
 import decorCinza2 from "./assets/decor/quadradinhos-cinza2.png";
@@ -16,12 +16,15 @@ import logoBradesco from "./assets/brand/logoBradesco.png";
 import logoCin from "./assets/brand/logoCin.png";
 import logoCintia from "./assets/brand/logoCintia.png";
 import logoConsultoria from "./assets/brand/logoConsultoria.png";
+import logoHackaWomanVertical from "./assets/brand/hackawomanlogovertical.png";
 import logoLigia from "./assets/brand/logoLigia.png";
 import logoMagalu from "./assets/brand/logoMagalu.png";
 import logoNavbar from "./assets/brand/logoNavbar.png";
 import logoPlexus from "./assets/brand/logoPlexus.png";
 import logoSecretaria from "./assets/brand/logoSecretaria.png";
 import logoTechwoman from "./assets/brand/logoTechwoman.png";
+import agendaClockIcon from "./assets/icons/agenda-clock.svg";
+import agendaPinIcon from "./assets/icons/agenda-pin.svg";
 import compromissoIcon from "./assets/icons/compromisso.png";
 import missaoIcon from "./assets/icons/missao.png";
 import visaoIcon from "./assets/icons/visao.png";
@@ -34,18 +37,26 @@ type Pillar = {
 
 type AgendaItem = {
   title: string;
-  subtitle: string;
-  place: string;
-  time: string;
+  subtitle?: string;
+  place?: string;
+  time?: string;
   featured?: boolean;
+};
+
+type AgendaPeriod = {
+  label: string;
+  items: AgendaItem[];
 };
 
 type AgendaDay = {
   day: string;
   month: string;
   weekday: string;
-  items: AgendaItem[];
+  note: string[];
+  periods: AgendaPeriod[];
 };
+
+const participationFormUrl = "https://forms.gle/ZJ8gCqx6sfC4hatz5";
 
 const highlights = [
   {
@@ -123,37 +134,88 @@ const agenda: AgendaDay[] = [
     day: "03",
     month: "Julho, 2026",
     weekday: "Sex",
-    items: [
+    note: ["Workshops", "Palestras", "Painéis"],
+    periods: [
       {
-        title: "Abertura oficial e credenciamento",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Auditório Principal",
-        time: "9:00h - 10:00h",
+        label: "Manhã",
+        items: [
+          {
+            title: "Credenciamento",
+            place: "Anfiteatro",
+            time: "08:00h - 09:00h",
+          },
+          {
+            title: "Abertura",
+            subtitle: "Avisos + Apresentação do tema do hackaton",
+            place: "Anfiteatro",
+            time: "09:00h - 09:20h",
+          },
+          {
+            title: "Dinâmica de integração",
+            subtitle: "Hora de trocar contatos / Linkedin",
+            place: "Anfiteatro",
+            time: "09:20h - 09:40h",
+          },
+          {
+            title: "Preparação & transição",
+            time: "09:40h - 10:00h",
+          },
+          {
+            title: "Palestra 1",
+            place: "Anfiteatro",
+            time: "10:00h - 10:50h",
+          },
+          {
+            title: "Workshop 1",
+            place: "Grad 2",
+            time: "10:00h - 11:00h",
+          },
+          {
+            title: "Sorteio",
+            time: "10:50h - 11:00h",
+          },
+          {
+            title: "Painel (Bradesco + Gov + Ligia + Regina Célia)",
+            place: "Anfiteatro",
+            time: "11:00h - 11:50h",
+          },
+          {
+            title: "Workshop 2",
+            place: "Grad 2",
+            time: "11:00h - 12:00h",
+          },
+        ],
       },
       {
-        title: "Workshop de UX",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 1",
-        time: "10:00h - 11:00h",
-      },
-      {
-        title: "HackaWoman",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 1",
-        time: "10:00h - 11:00h",
-        featured: true,
-      },
-      {
-        title: "Palestra Bradesco",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 3",
-        time: "10:00h - 11:00h",
-      },
-      {
-        title: "Mesa redonda - IA e futuro",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 3",
-        time: "10:00h - 11:00h",
+        label: "Tarde",
+        items: [
+          {
+            title: "Retorno + boas vindas",
+            time: "14:00h - 14:15h",
+          },
+          {
+            title: "Palestra com Regina Célia",
+            place: "Anfiteatro",
+            time: "14:15h - 15:40h",
+          },
+          {
+            title: "Sorteio",
+            time: "15:40h - 15:50h",
+          },
+          {
+            title: "Palestra 3",
+            place: "Anfiteatro",
+            time: "15:50h - 16:40h",
+          },
+          {
+            title: "Sorteio",
+            time: "16:40h - 16:50h",
+          },
+          {
+            title: "Encerramento do primeiro dia + foto oficial",
+            time: "16:50h - 17:00h",
+          },
+        ],
       },
     ],
   },
@@ -161,37 +223,50 @@ const agenda: AgendaDay[] = [
     day: "04",
     month: "Julho, 2026",
     weekday: "Sáb",
-    items: [
+    note: ["Hackathon"],
+    periods: [
       {
-        title: "Abertura oficial e credenciamento",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Auditório Principal",
-        time: "9:00h - 10:00h",
+        label: "Manhã",
+        items: [
+          {
+            title: "Desenvolvimento de soluções",
+            time: "09:00h - 10:30h",
+          },
+          {
+            title: "Coffee Break",
+            time: "10:30h - 10:45h",
+          },
+          {
+            title: "Desenvolvimento de soluções",
+            time: "10:45h - 12:00h",
+          },
+        ],
       },
       {
-        title: "Hackathon kickoff",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 1",
-        time: "10:00h - 11:00h",
-      },
-      {
-        title: "HackaWoman",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 1",
-        time: "10:00h - 11:00h",
-        featured: true,
-      },
-      {
-        title: "Mulheres na tecnologia",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 3",
-        time: "10:00h - 11:00h",
-      },
-      {
-        title: "Papo sobre o futuro",
-        subtitle: "Subtítulo para dar contexto",
-        place: "Local 3",
-        time: "10:00h - 11:00h",
+        label: "Tarde",
+        items: [
+          {
+            title: "Continuidade das soluções",
+            time: "14:00h - 15:00h",
+          },
+          {
+            title: "Coffee Break + Organização dos pitches",
+            time: "15:00h - 15:15h",
+          },
+          {
+            title: "Apresentações",
+            subtitle: "10 equipes\nPitch de 3 minutos + 2 minutos de perguntas",
+            time: "15:15h - 15:30h",
+          },
+          {
+            title: "Avaliação da banca",
+            time: "16:30h - 16:50h",
+          },
+          {
+            title: "Resultado + encerramento",
+            time: "16:50h - 17:00h",
+          },
+        ],
       },
     ],
   },
@@ -279,29 +354,65 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
   return (
     <article className="agenda-day">
       <div className="agenda-date">
-        <span>{day.weekday}</span>
-        <strong>{day.day}</strong>
-        <small>{day.month}</small>
-      </div>
-      <div className="timeline">
-        {day.items.map((item) => (
-          <div
-            className={item.featured ? "timeline-item timeline-item-featured" : "timeline-item"}
-            key={`${day.day}-${item.title}`}
-          >
-            <span
-              className={item.featured ? "timeline-marker marker-star" : "timeline-marker"}
-              aria-hidden="true"
-            />
-            <div className="timeline-copy">
-              <h3>{item.title}</h3>
-              <p>{item.subtitle}</p>
-        <div className="timeline-meta">
-          <span className="timeline-place">{item.place}</span>
-          <span className="timeline-time">{item.time}</span>
+        <div className="agenda-date-main">
+          <span>{day.weekday}</span>
+          <strong>{day.day}</strong>
         </div>
+        <small>{day.month}</small>
+        <em>
+          {day.note.map((line) => (
+            <span key={`${day.day}-${line}`}>{line}</span>
+          ))}
+        </em>
+      </div>
+      <div className="agenda-periods">
+        {day.periods.map((period) => (
+          <section className="agenda-period" key={`${day.day}-${period.label}`}>
+            <div className="agenda-period-label">
+              <span>{period.label}</span>
             </div>
-          </div>
+            <div className="timeline">
+              {period.items.map((item, index) => (
+                <div
+                  className={
+                    item.featured ? "timeline-item timeline-item-featured" : "timeline-item"
+                  }
+                  key={`${day.day}-${period.label}-${item.title}-${index}`}
+                >
+                  <span
+                    className={item.featured ? "timeline-marker marker-star" : "timeline-marker"}
+                    aria-hidden="true"
+                  />
+                  <div className="timeline-copy">
+                    <h3>{item.title}</h3>
+                    {item.subtitle ? (
+                      <p>
+                        {item.subtitle.split("\n").map((line) => (
+                          <span key={`${item.title}-${line}`}>{line}</span>
+                        ))}
+                      </p>
+                    ) : null}
+                    {item.place || item.time ? (
+                      <div className="timeline-meta">
+                        {item.place ? (
+                          <span className="timeline-place">
+                            <img src={agendaPinIcon} alt="" aria-hidden="true" />
+                            {item.place}
+                          </span>
+                        ) : null}
+                        {item.time ? (
+                          <span className="timeline-time">
+                            <img src={agendaClockIcon} alt="" aria-hidden="true" />
+                            {item.time}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </article>
@@ -310,6 +421,7 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
 
 function App() {
   const [isTopbarVisible, setIsTopbarVisible] = useState(true);
+  const anchorScrollHoldUntilRef = useRef(0);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -319,7 +431,9 @@ function App() {
       const currentScrollY = window.scrollY;
       const scrollDelta = currentScrollY - lastScrollY;
 
-      if (currentScrollY <= 8) {
+      if (window.performance.now() < anchorScrollHoldUntilRef.current) {
+        setIsTopbarVisible(true);
+      } else if (currentScrollY <= 8) {
         setIsTopbarVisible(true);
       } else if (scrollDelta > 6) {
         setIsTopbarVisible(false);
@@ -382,9 +496,29 @@ function App() {
     };
   }, []);
 
+  const handleTopbarAnchorClick = (event: MouseEvent<HTMLElement>) => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const anchor = target.closest<HTMLAnchorElement>("a[href^='#']");
+
+    if (!anchor) {
+      return;
+    }
+
+    anchorScrollHoldUntilRef.current = window.performance.now() + 1200;
+    setIsTopbarVisible(true);
+  };
+
   return (
     <main className="site">
-      <header className={isTopbarVisible ? "topbar" : "topbar topbar-hidden"}>
+      <header
+        className={isTopbarVisible ? "topbar" : "topbar topbar-hidden"}
+        onClick={handleTopbarAnchorClick}
+      >
         <a className="brand" href="#home" aria-label="HackaWoman início">
           <NavbarLogo />
         </a>
@@ -394,8 +528,8 @@ function App() {
           <a href="#programacao">Programação</a>
           <a href="#parceiros">Parceiros</a>
         </nav>
-        <a className="nav-cta" href="#inscricao">
-          <span>Inscreva-se já</span>
+        <a className="nav-cta" href={participationFormUrl} target="_blank" rel="noreferrer">
+          <span>Quero participar</span>
         </a>
       </header>
 
@@ -405,7 +539,12 @@ function App() {
         <div className="hero-content">
           <HeroLogo />
           <p>Juntas, transformando o hoje e construindo o amanhã.</p>
-          <a className="button button-primary" href="#inscricao">
+          <a
+            className="button button-primary"
+            href={participationFormUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
             <span>Garanta sua vaga</span>
           </a>
           <div className="hero-date">
@@ -425,12 +564,37 @@ function App() {
           <div>
             <SectionTitle eyebrow="Sobre o evento" title="Inovação que transforma." />
             <p className="body-copy">
-              O HackaWoman é um hackathon exclusivo para mulheres, onde talento,
-              tecnologia e representatividade se unem para gerar impacto social.
+              Hacka Woman é um hackathon idealizado pela{" "}
+              <strong>LIGIA — Liga de Inteligência Artificial</strong>, com
+              realização do{" "}
+              <strong>
+                Centro de Informática (CIn) da Universidade Federal de
+                Pernambuco
+              </strong>
+              , organizado em conjunto com o{" "}
+              <strong>Grupo Cintia e a Tech Woman</strong>. O evento conta
+              ainda com{" "}
+              <strong>
+                co-organização estratégica do Plexos Institute
+              </strong>
+              , apoio tecnológico da <strong>Magalu Cloud</strong> e
+              colaboração de diversas comunidades de tecnologia, entre elas{" "}
+              <strong>
+                RFEC+, DevOpsDays Recife, Somos Minas, Garota Cibernética e
+                Techs for Women
+              </strong>
+              .
             </p>
             <p className="body-copy">
-              Criamos oportunidades de aprendizado, colaboração e inovação, usando
-              a tecnologia como ferramenta de transformação para comunidades.
+              O projeto nasce com o propósito de inspirar, conectar e impulsionar
+              mulheres na área de tecnologia, promovendo um ambiente colaborativo
+              voltado à inovação, aprendizagem prática e desenvolvimento de
+              soluções tecnológicas com impacto social e econômico. A iniciativa
+              também busca fortalecer a presença feminina no ecossistema
+              tecnológico, criando oportunidades concretas de inovação,
+              networking e empregabilidade, além de ampliar a visibilidade de
+              talentos femininos e estimular a construção de soluções voltadas a
+              desafios reais da sociedade e do mercado.
             </p>
           </div>
           <div className="inspire-panel" aria-label="Inspire, crie, realize">
@@ -442,8 +606,8 @@ function App() {
               <br />
               Realize.
             </strong>
-            <a href="#inscricao">
-              <span>Inscreva-se já</span>
+            <a href={participationFormUrl} target="_blank" rel="noreferrer">
+              <span>Quero participar</span>
             </a>
           </div>
         </div>
@@ -527,30 +691,50 @@ function App() {
           <p>
             Seja uma das mulheres que vai transformar o ecossistema tech de Pernambuco.
           </p>
-          <a className="button button-primary" href="mailto:contato@hackawoman.com">
+          <a
+            className="button button-primary"
+            href={participationFormUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
             <span>Quero participar</span>
           </a>
           <small>As vagas são limitadas, então garanta já a sua!</small>
-          <HackaLogo compact />
+          <img className="final-cta-logo" src={logoHackaWomanVertical} alt="HackaWoman" />
         </div>
       </section>
 
       <footer className="footer" data-scrollbar-section="orange">
-        <div>
-          <HackaLogo compact />
-          <p>Juntas, transformando o hoje e construindo o amanhã.</p>
+        <div className="footer-main">
+          <div className="footer-brand">
+            <strong>hackawoman</strong>
+            <p>
+              Hackathon exclusivo para mulheres que acreditam no poder da tecnologia.
+            </p>
+          </div>
+          <nav className="footer-links" aria-label="Navegação do rodapé">
+            <h2>Navegação</h2>
+            <a href="#sobre">Sobre</a>
+            <a href="#pilares">Nossos pilares</a>
+            <a href="#programacao">Programação</a>
+            <a href="#parceiros">Parceiros</a>
+          </nav>
+          <div className="footer-contact">
+            <h2>Contato</h2>
+            <a href="mailto:contato@hackawoman.com.br">contato@hackawoman.com.br</a>
+            <a
+              href="https://www.instagram.com/ligia.ufpe/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              @ligia
+            </a>
+          </div>
         </div>
-        <div>
-          <h2>Mapa</h2>
-          <a href="#sobre">Sobre</a>
-          <a href="#programacao">Programação</a>
-          <a href="#parceiros">Parceiros</a>
-        </div>
-        <div>
-          <h2>Contato</h2>
-          <a href="mailto:contato@hackawoman.com">contato@hackawoman.com</a>
-          <span>@hackawoman</span>
-        </div>
+        <p className="footer-copy">
+          © 2026 HackaWoman - Ligia (Liga Acadêmica de Inteligência Artificial da
+          UFPE). Todos os direitos reservados.
+        </p>
       </footer>
     </main>
   );
