@@ -350,7 +350,7 @@ a {
 .hero-content {
   --hero-mark-size: clamp(120px, min(9vw, 18svh), 155px);
   --hero-logo-size: clamp(56px, min(7vw, 13svh), 120px);
-  --hero-copy-size: clamp(18px, min(1.35vw, 2.8svh), 24px);
+  --hero-copy-size: 20px;
   --hero-date-size: clamp(44px, min(4.4vw, 7.6svh), 64px);
 
   align-self: stretch;
@@ -369,9 +369,11 @@ a {
 .hero-content p {
   width: min(410px, 100%);
   margin: 0;
-  color: var(--text-subtitle);
+  color: var(--color-white);
+  font-family: var(--font-body);
   font-size: var(--hero-copy-size);
   font-weight: 600;
+  letter-spacing: 2px;
   line-height: 1.6;
 }
 
@@ -553,7 +555,7 @@ a {
   width: fit-content;
   color: var(--color-white);
   font-family: var(--font-heading);
-  font-size: clamp(18px, min(1.3vw, 2.4svh), 24px);
+  font-size: 20px;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;
@@ -1610,9 +1612,9 @@ a {
     border-bottom-left-radius: 156px;
   }
 
-  .hero-content .logo-mark {
-    width: 96px;
-    height: 96px;
+  .hero-content {
+    --hero-mark-size: 96px;
+    --hero-copy-size: 16px;
   }
 
   .logo-word,
@@ -1622,6 +1624,10 @@ a {
 
   .hero-date {
     margin-top: 18px;
+  }
+
+  .hero-date span {
+    font-size: 16px;
   }
 
   .section-title h2 {
