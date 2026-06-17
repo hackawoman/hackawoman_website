@@ -721,7 +721,7 @@ function App() {
           </nav>
           <div className="footer-contact">
             <h2>Contato</h2>
-            <a href="mailto:contato@hackawoman.com.br">contato@hackawoman.com.br</a>
+            <a href="mailto:hackawoman@cin.ufpe.br">hackawoman@cin.ufpe.br</a>
             <a
               href="https://www.instagram.com/ligia.ufpe/"
               target="_blank"
