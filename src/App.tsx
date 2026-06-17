@@ -730,6 +730,16 @@ function App() {
               @ligia
             </a>
           </div>
+          <div className="footer-edital">
+  <h2>Edital</h2>
+  <a 
+    href="/edital.pdf" 
+    target="_blank" 
+    rel="noreferrer"
+  >
+    Acessar edital completo
+  </a>
+</div>
         </div>
         <p className="footer-copy">
           © 2026 HackaWoman - Ligia (Liga Acadêmica de Inteligência Artificial da
