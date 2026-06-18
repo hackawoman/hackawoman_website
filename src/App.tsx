@@ -440,6 +440,20 @@ function App() {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    const resetMenuState = () => {
+      setIsMenuOpen(false);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+
+    window.addEventListener("pagehide", resetMenuState);
+
+    return () => {
+      window.removeEventListener("pagehide", resetMenuState);
+    };
+  }, []);
+
   const calculateTimeLeft = () => {
     const difference = +new Date('2026-07-03T08:00:00') - +new Date();
     let timeLeft = { dias: 0, horas: 0, minutos: 0, segundos: 0 };
@@ -590,7 +604,14 @@ function App() {
           <a href="#parceiros" onClick={() => setIsMenuOpen(false)}>Parceiros</a>
 
           <div className="mobile-only sidebar-actions">
-            <a className="sidebar-edital-link" href="/edital.pdf" target="_blank" rel="noreferrer" onClick={() => setIsMenuOpen(false)}>
+            <a
+              className="sidebar-edital-link"
+              href="/edital.pdf"
+              target="_blank"
+              rel="noreferrer"
+              onPointerDown={() => setIsMenuOpen(false)}
+              onClick={() => setIsMenuOpen(false)}
+            >
               Acessar edital
             </a>
             <a className="nav-cta" href={participationFormUrl} target="_blank" rel="noreferrer" onClick={() => setIsMenuOpen(false)}>
