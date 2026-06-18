@@ -427,9 +427,14 @@ function App() {
     document.documentElement.style.overflow = "";
   }, []);
 
-  const closeMenuForExternalLink = useCallback(() => {
-    resetMenuState();
-  }, [resetMenuState]);
+  const handleSidebarExternalLinkClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      window.open(event.currentTarget.href, "_blank", "noopener,noreferrer");
+      resetMenuState();
+    },
+    [resetMenuState],
+  );
 
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
@@ -627,8 +632,7 @@ function App() {
               href="/edital.pdf"
               target="_blank"
               rel="noreferrer"
-              onPointerDown={closeMenuForExternalLink}
-              onClick={closeMenuForExternalLink}
+              onClick={handleSidebarExternalLinkClick}
             >
               Acessar edital
             </a>
@@ -637,8 +641,7 @@ function App() {
               href={participationFormUrl}
               target="_blank"
               rel="noreferrer"
-              onPointerDown={closeMenuForExternalLink}
-              onClick={closeMenuForExternalLink}
+              onClick={handleSidebarExternalLinkClick}
             >
               <span>Inscreva-se</span>
             </a>
