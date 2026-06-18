@@ -1993,7 +1993,21 @@ a {
     padding: 0;
     background: transparent;
     cursor: pointer;
-    z-index: 1010;
+    z-index: 3;
+  }
+
+  .menu-backdrop {
+    position: fixed;
+    top: var(--topbar-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: default;
+    touch-action: none;
   }
 
   .hamburger-bar {
@@ -2039,6 +2053,7 @@ a {
     opacity: 0;
     visibility: hidden;
     transform: translateX(100%);
+    z-index: 2;
     transition:
       opacity 180ms ease,
       transform 180ms ease,

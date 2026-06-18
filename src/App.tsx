@@ -420,6 +420,26 @@ function App() {
   const [isTopbarVisible, setIsTopbarVisible] = useState(true);
   const anchorScrollHoldUntilRef = useRef(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    if (!isMenuOpen || !isMobile) {
+      return;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [isMenuOpen]);
+
   const calculateTimeLeft = () => {
     const difference = +new Date('2026-07-03T08:00:00') - +new Date();
     let timeLeft = { dias: 0, horas: 0, minutos: 0, segundos: 0 };
@@ -553,6 +573,15 @@ function App() {
           <span className="hamburger-bar"></span>
           <span className="hamburger-bar"></span>
         </button>
+
+        {isMenuOpen ? (
+          <button
+            className="menu-backdrop mobile-only"
+            type="button"
+            aria-label="Fechar menu de navegação"
+            onClick={() => setIsMenuOpen(false)}
+          />
+        ) : null}
 
         <nav className={`nav ${isMenuOpen ? 'active' : ''}`} aria-label="Navegação principal">
           <a href="#sobre" onClick={() => setIsMenuOpen(false)}>Sobre</a>
