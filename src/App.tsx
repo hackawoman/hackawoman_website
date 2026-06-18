@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import decorBranco from "./assets/decor/quadradinhos-branco.png";
 import decorCinza from "./assets/decor/quadradinhos-cinza.png";
 import decorCinza2 from "./assets/decor/quadradinhos-cinza2.png";
@@ -421,6 +421,16 @@ function App() {
   const anchorScrollHoldUntilRef = useRef(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const resetMenuState = useCallback(() => {
+    setIsMenuOpen(false);
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }, []);
+
+  const closeMenuForExternalLink = useCallback(() => {
+    resetMenuState();
+  }, [resetMenuState]);
+
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
@@ -428,31 +438,38 @@ function App() {
       return;
     }
 
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = previousBodyOverflow;
-      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isMenuOpen]);
 
   useEffect(() => {
-    const resetMenuState = () => {
-      setIsMenuOpen(false);
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        resetMenuState();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        resetMenuState();
+      }
     };
 
     window.addEventListener("pagehide", resetMenuState);
+    window.addEventListener("pageshow", handlePageShow);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("pagehide", resetMenuState);
+      window.removeEventListener("pageshow", handlePageShow);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [resetMenuState]);
 
   const calculateTimeLeft = () => {
     const difference = +new Date('2026-07-03T08:00:00') - +new Date();
@@ -580,8 +597,9 @@ function App() {
 
         <button
           className={`menu-toggle mobile-only ${isMenuOpen ? 'open' : ''}`}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Abrir menu de navegação"
+          onClick={() => setIsMenuOpen((open) => !open)}
+          aria-label={isMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
+          aria-expanded={isMenuOpen}
         >
           <span className="hamburger-bar"></span>
           <span className="hamburger-bar"></span>
@@ -604,16 +622,24 @@ function App() {
           <a href="#parceiros" onClick={() => setIsMenuOpen(false)}>Parceiros</a>
 
           <div className="mobile-only sidebar-actions">
-          <a
+            <a
               className="sidebar-edital-link"
               href="/edital.pdf"
               target="_blank"
               rel="noreferrer"
-              onClick={() => setIsMenuOpen(false)}
+              onPointerDown={closeMenuForExternalLink}
+              onClick={closeMenuForExternalLink}
             >
               Acessar edital
             </a>
-            <a className="nav-cta" href={participationFormUrl} target="_blank" rel="noreferrer" onClick={() => setIsMenuOpen(false)}>
+            <a
+              className="nav-cta"
+              href={participationFormUrl}
+              target="_blank"
+              rel="noreferrer"
+              onPointerDown={closeMenuForExternalLink}
+              onClick={closeMenuForExternalLink}
+            >
               <span>Inscreva-se</span>
             </a>
           </div>
