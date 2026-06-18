@@ -524,7 +524,7 @@ function App() {
         </a>
         <nav className="nav" aria-label="Navegação principal">
           <a href="#sobre">Sobre</a>
-          <a href="#pilares">Nossos Pilares</a>
+          <a href="#pilares">Pilares</a>
           <a href="#programacao">Programação</a>
           <a href="#parceiros">Parceiros</a>
         </nav>
