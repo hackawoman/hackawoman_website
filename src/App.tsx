@@ -604,12 +604,11 @@ function App() {
           <a href="#parceiros" onClick={() => setIsMenuOpen(false)}>Parceiros</a>
 
           <div className="mobile-only sidebar-actions">
-            <a
+          <a
               className="sidebar-edital-link"
               href="/edital.pdf"
               target="_blank"
               rel="noreferrer"
-              onPointerDown={() => setIsMenuOpen(false)}
               onClick={() => setIsMenuOpen(false)}
             >
               Acessar edital
