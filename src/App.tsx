@@ -636,15 +636,9 @@ function App() {
             >
               Acessar edital
             </a>
-            <a
-              className="nav-cta"
-              href={participationFormUrl}
-              target="_blank"
-              rel="noreferrer"
-              onClick={handleSidebarExternalLinkClick}
-            >
-              <span>Inscreva-se</span>
-            </a>
+            <span className="nav-cta cta-unavailable" aria-disabled="true">
+              <span>Inscrições encerradas</span>
+            </span>
           </div>
         </nav>
 
@@ -652,9 +646,9 @@ function App() {
           <a className="edital-link" href="/edital.pdf" target="_blank" rel="noreferrer">
             Acessar edital
           </a>
-          <a className="nav-cta" href={participationFormUrl} target="_blank" rel="noreferrer">
-            <span>Inscreva-se</span>
-          </a>
+          <span className="nav-cta cta-unavailable" aria-disabled="true">
+            <span>Inscrições encerradas</span>
+          </span>
         </div>
       </header>
 
@@ -664,14 +658,10 @@ function App() {
         <div className="hero-content">
           <HeroLogo />
           <p>Juntas, transformando o hoje e construindo o amanhã.</p>
-          <a
-            className="button button-primary"
-            href={participationFormUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span>Garanta sua vaga</span>
-          </a>
+          <span className="button button-primary cta-unavailable" aria-disabled="true">
+            <span>Inscrições encerradas</span>
+          </span>
+        
           <div className="hero-date">
             <strong>03 e 04 de Julho</strong>
             <span>
@@ -731,8 +721,8 @@ function App() {
               <br />
               Realize.
             </strong>
-            <a href={participationFormUrl} target="_blank" rel="noreferrer">
-              <span>Quero participar</span>
+            <a href={"https://www.instagram.com/ligia.ufpe/"} target="_blank" rel="noreferrer">
+              <span>Visitar nosso perfil</span>
             </a>
           </div>
         </div>
@@ -811,24 +801,22 @@ function App() {
       </section>
 <section className="final-cta section-pad" id="inscricao" data-scrollbar-section="orange">
   <div className="cta-content">
-    <SectionTitle eyebrow="Inscrições abertas" title="Faça parte da história" light />
+    <SectionTitle eyebrow="Inscrições encerradas" title="Faça parte da história" light />
     <p>
       Seja uma das mulheres que vai transformar o ecossistema tech de Pernambuco.
     </p>
 
     {/* 1. BOTÃO DE INSCRIÇÃO COM MARGENS RESPONSIVAS */}
-    <a
-      className="button button-primary"
-      href={participationFormUrl}
-      target="_blank"
-      rel="noreferrer"
-      style={{ 
-        marginTop: 'clamp(-20px, -3vw, 0px)',   /* Menos agressivo no mobile, evita grudar no texto de cima */
-        marginBottom: 'clamp(24px, 5vw, 60px)' /* Diminui o espaçamento no mobile e assume 60px no desktop */
+   <span
+      className="button button-primary cta-unavailable"
+      aria-disabled="true"
+      style={{
+        marginTop: 'clamp(-20px, -3vw, 0px)',
+        marginBottom: 'clamp(24px, 5vw, 60px)'
       }}
     >
-      <span>Quero participar</span>
-    </a>
+      <span>Inscrições encerradas</span>
+    </span>
 
     {/* 📦 CONTÊINER ÚNICO MESTRE (Une o cronômetro e o bloco de textos) */}
     <div style={{
@@ -896,7 +884,7 @@ function App() {
 
         {/* 4. TEXTO DE VAGAS LIMITADAS */}
         <small style={{ margin: 0, display: 'block' }}>
-          As vagas são limitadas, então garanta já a sua!
+          Obrigada a todas as inscritas! Nos vemos no Centro de Informática da UFPE.
         </small>
       </div>
 
