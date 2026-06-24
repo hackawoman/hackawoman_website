@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import decorBranco from "./assets/decor/quadradinhos-branco.png";
 import decorCinza from "./assets/decor/quadradinhos-cinza.png";
 import decorCinza2 from "./assets/decor/quadradinhos-cinza2.png";
@@ -937,6 +938,7 @@ function App() {
           UFPE). Todos os direitos reservados.
         </p>
       </footer>
+      <Analytics />
     </main>
   );
 }
