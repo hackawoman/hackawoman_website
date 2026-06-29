@@ -28,6 +28,7 @@ import agendaPinIcon from "./assets/icons/agenda-pin.svg";
 import compromissoIcon from "./assets/icons/compromisso.png";
 import missaoIcon from "./assets/icons/missao.png";
 import visaoIcon from "./assets/icons/visao.png";
+import { Analytics } from "@vercel/analytics/next"
 
 type Pillar = {
   number: string;
