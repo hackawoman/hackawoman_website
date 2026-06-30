@@ -58,6 +58,7 @@ type AgendaDay = {
 };
 
 const participationFormUrl = "https://forms.gle/BH85Hj1xWaUh28Nh7";
+const participationFormUrlShort = "forms.gle/BH85Hj1xWaUh28Nh7";
 
 const highlights = [
   {
