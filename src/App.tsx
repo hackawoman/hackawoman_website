@@ -23,12 +23,9 @@ import logoNavbar from "./assets/brand/logoNavbar.png";
 import logoPlexus from "./assets/brand/logoPlexus.png";
 import logoSecretaria from "./assets/brand/logoSecretaria.png";
 import logoTechwoman from "./assets/brand/logoTechwoman.png";
-import agendaClockIcon from "./assets/icons/agenda-clock.svg";
-import agendaPinIcon from "./assets/icons/agenda-pin.svg";
 import compromissoIcon from "./assets/icons/compromisso.png";
 import missaoIcon from "./assets/icons/missao.png";
 import visaoIcon from "./assets/icons/visao.png";
-import { Analytics } from "@vercel/analytics/next"
 
 type Pillar = {
   number: string;
@@ -36,29 +33,36 @@ type Pillar = {
   description: string;
 };
 
-type AgendaItem = {
-  title: string;
-  subtitle?: string;
-  place?: string;
-  time?: string;
-  featured?: boolean;
-};
-
-type AgendaPeriod = {
-  label: string;
-  items: AgendaItem[];
-};
-
 type AgendaDay = {
   day: string;
   month: string;
   weekday: string;
   note: string[];
-  periods: AgendaPeriod[];
+  photos: GalleryPhoto[];
 };
 
-const participationFormUrl = "https://forms.gle/BH85Hj1xWaUh28Nh7";
-const participationFormUrlShort = "forms.gle/BH85Hj1xWaUh28Nh7";
+// type Winner = {
+//   position: string;
+//   team: string;
+//   project: string;
+//   description?: string;
+// };
+
+type GalleryPhoto = {
+  src: string;
+  alt: string;
+};
+
+// const winners: Winner[] = [];
+
+const fotosDia1 = Object.values(
+  import.meta.glob("./assets/galeria/dia1/*", { eager: true, import: "default" })
+) as string[];
+
+const fotosDia2 = Object.values(
+  import.meta.glob("./assets/galeria/dia2/*", { eager: true, import: "default" })
+) as string[];
+
 
 const highlights = [
   {
@@ -137,137 +141,14 @@ const agenda: AgendaDay[] = [
     month: "Julho, 2026",
     weekday: "Sex",
     note: ["Workshops", "Palestras", "Painéis"],
-    periods: [
-      {
-        label: "Manhã",
-        items: [
-          {
-            title: "Credenciamento",
-            // place: "Anfiteatro",
-            time: "08:00h - 09:00h",
-          },
-          {
-            title: "Abertura",
-            subtitle: "Avisos + Apresentação do tema do hackaton",
-            // place: "Anfiteatro",
-            time: "09:00h - 09:20h",
-          },
-          {
-            title: "Dinâmica de integração",
-            subtitle: "Dinâmica rápida de integração → ideia: “conecte-se para crescer” (troca de contatos / LinkedIn)",
-            // place: "Anfiteatro",
-            time: "09:20h - 09:40h",
-          },
-          {
-            title: "Palestra 1 (Magalu)",
-            time: "09:40h - 10:30h",
-          },
-          {
-            title: "Workshop 1 – CLOUD",
-            // place: "Anfiteatro",
-            time: "09:40h - 10:30h",
-          },
-          {
-            title: "Coffee-Break + Sorteio",
-            // place: "Grad 2",
-            time: "10:30h - 11:00h",
-          },
-          {
-            title: "Painel (Bradesco + Gov + Lígia/CIntia + ADM Mulher/CRA)",
-            time: "11:00h - 11:50h",
-          },
-          {
-            title: "Workshop 2 – PITCH",
-            // place: "Grad 2",
-            time: "11:00h - 11:50h",
-          },
-          {
-            title: "Fechamento da manhã + intervalo",
-            // place: "Grad 2",
-            time: "11:50h - 12:00h",
-          },
-        ],
-      },
-      {
-        label: "Tarde",
-        items: [
-          {
-            title: "Retorno + boas-vindas",
-            time: "14:00h - 14:15h",
-          },
-          {
-            title: "Palestra com Regina Célia",
-            // place: "Anfiteatro",
-            time: "14:15h - 15:05h",
-          },
-          {
-            title: "Coffee-Break + Sorteio",
-            // place: "Grad 2",
-            time: "15:05h - 15:35h",
-          },
-          {
-            title: "Dinâmica de Formação de Equipes",
-            time: "15:35h - 15:50h",
-          },
-          {
-            title: "Palestra com Laís Xavier",
-            // place: "Anfiteatro",
-            time: "15:50h - 16:40h",
-          },
-          {
-            title: "Sorteio",
-            time: "16:40h - 16:50h",
-          },
-          {
-            title: "Encerramento do primeiro dia + foto oficial",
-            time: "16:50h - 17:00h",
-          },
-        ],
-      },
-    ],
+    photos: fotosDia1.map((src) => ({ src, alt: "Foto do evento — dia 1" })),
   },
   {
     day: "04",
     month: "Julho, 2026",
     weekday: "Sáb",
     note: ["Hackathon"],
-    periods: [
-      {
-        label: "Manhã",
-        items: [
-          {
-            title: "Desenvolvimento de soluções",
-            time: "09:00h - 12:00h",
-          },
-        ],
-      },
-      {
-        label: "Tarde",
-        items: [
-          {
-            title: "Continuidade das soluções",
-            time: "14:00h - 15:00h",
-          },
-          {
-            title: "Organização dos pitches",
-            time: "15:00h - 15:30h",
-          },
-          {
-            title: "Apresentações",
-            subtitle: "15 equipes\nPitch de 3 minutos + 2 minutos de perguntas",
-            time: "15:30h - 16:45h",
-          },
-          {
-            title: "Avaliação da banca",
-            time: "16:45h - 17:15h",
-          },
-          {
-            title: "Resultado + encerramento",
-            time: "17:15h - 18:00h",
-          },
-        ],
-      },
-    ],
+    photos: fotosDia2.map((src) => ({ src, alt: "Foto do evento — dia 2" })),
   },
 ];
 
@@ -315,23 +196,6 @@ function HeroLogo() {
   );
 }
 
-function HackaLogo({ compact = false }: { compact?: boolean }) {
-  return (
-    <div className={compact ? "logo logo-compact" : "logo"} aria-label="HackaWoman">
-      <span className="logo-mark" aria-hidden="true">
-        <span className="logo-petal logo-petal-left" />
-        <span className="logo-petal logo-petal-right" />
-        <span className="logo-dot logo-dot-one" />
-        <span className="logo-dot logo-dot-two" />
-      </span>
-      <span className="logo-word">
-        <span>hacka</span>
-        <span>woman</span>
-      </span>
-    </div>
-  );
-}
-
 function SectionTitle({
   eyebrow,
   title,
@@ -349,7 +213,87 @@ function SectionTitle({
   );
 }
 
+function DaySlideshow({ photos }: { photos: GalleryPhoto[] }) {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (photos.length <= 1) return;
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % photos.length);
+    }, 10000);
+  }, [photos.length]);
+
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [startTimer]);
+
+  const go = (dir: 1 | -1) => {
+    setCurrent((prev) => (prev + dir + photos.length) % photos.length);
+    startTimer();
+  };
+
+  return (
+    <div className={photos.length === 0 ? "day-slideshow day-slideshow-empty" : "day-slideshow"}>
+      {photos.map((photo, index) => (
+        <img
+          key={photo.src}
+          className={index === current ? "day-slideshow-slide active" : "day-slideshow-slide"}
+          src={photo.src}
+          alt={photo.alt}
+        />
+      ))}
+      {photos.length > 1 && (
+        <>
+          <button className="day-slideshow-btn day-slideshow-btn-prev" onClick={() => go(-1)} aria-label="Foto anterior">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M12 5L7 10L12 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <button className="day-slideshow-btn day-slideshow-btn-next" onClick={() => go(1)} aria-label="Próxima foto">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M8 5L13 10L8 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <span className="day-slideshow-counter">{current + 1} / {photos.length}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function PhotoModal({ photos, onClose }: { photos: GalleryPhoto[]; onClose: () => void }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div className="photo-modal-overlay" onClick={onClose}>
+      <div className="photo-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="photo-modal-close" onClick={onClose} aria-label="Fechar galeria">✕</button>
+        <div className="photo-modal-grid">
+          {photos.map((photo, index) => (
+            <figure className="photo-modal-item" key={index}>
+              <img src={photo.src} alt={photo.alt} loading="lazy" />
+            </figure>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AgendaBlock({ day }: { day: AgendaDay }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <article className="agenda-day">
       <div className="agenda-date">
@@ -364,56 +308,15 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
           ))}
         </em>
       </div>
-      <div className="agenda-periods">
-        {day.periods.map((period) => (
-          <section className="agenda-period" key={`${day.day}-${period.label}`}>
-            <div className="agenda-period-label">
-              <span>{period.label}</span>
-            </div>
-            <div className="timeline">
-              {period.items.map((item, index) => (
-                <div
-                  className={
-                    item.featured ? "timeline-item timeline-item-featured" : "timeline-item"
-                  }
-                  key={`${day.day}-${period.label}-${item.title}-${index}`}
-                >
-                  <span
-                    className={item.featured ? "timeline-marker marker-star" : "timeline-marker"}
-                    aria-hidden="true"
-                  />
-                  <div className="timeline-copy">
-                    <h3>{item.title}</h3>
-                    {item.subtitle ? (
-                      <p>
-                        {item.subtitle.split("\n").map((line) => (
-                          <span key={`${item.title}-${line}`}>{line}</span>
-                        ))}
-                      </p>
-                    ) : null}
-                    {item.place || item.time ? (
-                      <div className="timeline-meta">
-                        {item.place ? (
-                          <span className="timeline-place">
-                            <img src={agendaPinIcon} alt="" aria-hidden="true" />
-                            {item.place}
-                          </span>
-                        ) : null}
-                        {item.time ? (
-                          <span className="timeline-time">
-                            <img src={agendaClockIcon} alt="" aria-hidden="true" />
-                            {item.time}
-                          </span>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
+      <div className="agenda-day-gallery">
+        <DaySlideshow photos={day.photos} />
+        {day.photos.length > 0 && (
+          <button className="agenda-see-all" onClick={() => setIsModalOpen(true)}>
+            Ver todas
+          </button>
+        )}
       </div>
+      {isModalOpen && <PhotoModal photos={day.photos} onClose={() => setIsModalOpen(false)} />}
     </article>
   );
 }
@@ -477,30 +380,6 @@ function App() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [resetMenuState]);
-
-  const calculateTimeLeft = () => {
-    const difference = +new Date('2026-07-03T08:00:00') - +new Date();
-    let timeLeft = { dias: 0, horas: 0, minutos: 0, segundos: 0 };
-
-    if (difference > 0) {
-      timeLeft = {
-        dias: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        horas: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutos: Math.floor((difference / 1000 / 60) % 60),
-        segundos: Math.floor((difference / 1000) % 60),
-      };
-    }
-    return timeLeft;
-  };
-
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-    return () => clearTimeout(timer);
-  });
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -603,7 +482,7 @@ function App() {
         </a>
 
         <button
-          className={`menu-toggle mobile-only ${isMenuOpen ? 'open' : ''}`}
+          className={`menu-toggle mobile-only ${isMenuOpen ? "open" : ""}`}
           onClick={() => setIsMenuOpen((open) => !open)}
           aria-label={isMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
           aria-expanded={isMenuOpen}
@@ -622,10 +501,10 @@ function App() {
           />
         ) : null}
 
-        <nav className={`nav ${isMenuOpen ? 'active' : ''}`} aria-label="Navegação principal">
+        <nav className={`nav ${isMenuOpen ? "active" : ""}`} aria-label="Navegação principal">
           <a href="#sobre" onClick={() => setIsMenuOpen(false)}>Sobre</a>
-          <a href="#pilares" onClick={() => setIsMenuOpen(false)}>Pilares</a>
-          <a href="#programacao" onClick={() => setIsMenuOpen(false)}>Programação</a>
+          {/* <a href="#resultados" onClick={() => setIsMenuOpen(false)}>Resultados</a> */}
+          <a href="#galeria" onClick={() => setIsMenuOpen(false)}>Galeria</a>
           <a href="#parceiros" onClick={() => setIsMenuOpen(false)}>Parceiros</a>
 
           <div className="mobile-only sidebar-actions">
@@ -638,9 +517,6 @@ function App() {
             >
               Acessar edital
             </a>
-            <span className="nav-cta cta-unavailable" aria-disabled="true">
-              <span>Inscrições encerradas</span>
-            </span>
           </div>
         </nav>
 
@@ -648,9 +524,6 @@ function App() {
           <a className="edital-link" href="/edital.pdf" target="_blank" rel="noreferrer">
             Acessar edital
           </a>
-          <span className="nav-cta cta-unavailable" aria-disabled="true">
-            <span>Inscrições encerradas</span>
-          </span>
         </div>
       </header>
 
@@ -659,17 +532,10 @@ function App() {
         <DecorSquares className="decor-hero-gray-bottom" src={decorCinza2} />
         <div className="hero-content">
           <HeroLogo />
-          <p>Juntas, transformando o hoje e construindo o amanhã.</p>
-          <span className="button button-primary cta-unavailable" aria-disabled="true">
-            <span>Inscrições encerradas</span>
-          </span>
-        
-          <div className="hero-date">
-            <strong>03 e 04 de Julho</strong>
-            <span>
-              <em>Centro de Informática UFPE</em>
-            </span>
-          </div>
+          <p>Juntas, transformamos o ecossistema tech de Pernambuco.</p>
+          {/* <a className="button button-primary" href="#resultados">
+            <span>Ver resultados</span>
+          </a> */}
           <a className="scroll-cue" href="#sobre" aria-label="Ir para a próxima seção">
             <span />
           </a>
@@ -741,6 +607,24 @@ function App() {
         ))}
       </section>
 
+      {/* <section className="results section-pad" id="resultados" data-scrollbar-section="purple">
+        <div className="inner">
+          <SectionTitle eyebrow="Hackathon 2026" title="Resultados." />
+          <div className="results-grid">
+            {winners.map((winner) => (
+              <article className="result-card" key={winner.position}>
+                <span className="result-position">{winner.position}</span>
+                <h3>{winner.team}</h3>
+                <p>{winner.project}</p>
+                {winner.description ? (
+                  <p className="result-description">{winner.description}</p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section> */}
+
       <section className="pillars section-pad" id="pilares" data-scrollbar-section="purple">
         <div className="inner">
           <SectionTitle eyebrow="Nossos pilares" title="O que nos move." />
@@ -773,10 +657,10 @@ function App() {
         </div>
       </section>
 
-      <section className="agenda section-pad" id="programacao" data-scrollbar-section="orange">
+      <section className="agenda section-pad" id="galeria" data-scrollbar-section="orange">
         <DecorSquares className="decor-agenda-orange" src={decorLaranja2} />
         <div className="inner">
-          <SectionTitle eyebrow="Programação" title="Agenda do evento." light />
+          <SectionTitle eyebrow="Galeria" title="Como foi o evento." light />
           <div className="agenda-list">
             {agenda.map((day) => (
               <AgendaBlock day={day} key={day.day} />
@@ -801,101 +685,16 @@ function App() {
           </div>
         </div>
       </section>
-<section className="final-cta section-pad" id="inscricao" data-scrollbar-section="orange">
-  <div className="cta-content">
-    <SectionTitle eyebrow="Inscrições encerradas" title="Faça parte da história" light />
-    <p>
-      Seja uma das mulheres que vai transformar o ecossistema tech de Pernambuco.
-    </p>
 
-    {/* 1. BOTÃO DE INSCRIÇÃO COM MARGENS RESPONSIVAS */}
-   <span
-      className="button button-primary cta-unavailable"
-      aria-disabled="true"
-      style={{
-        marginTop: 'clamp(-20px, -3vw, 0px)',
-        marginBottom: 'clamp(24px, 5vw, 60px)'
-      }}
-    >
-      <span>Inscrições encerradas</span>
-    </span>
-
-    {/* 📦 CONTÊINER ÚNICO MESTRE (Une o cronômetro e o bloco de textos) */}
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '20px', /* ⬅️ Defina aqui a distância exata entre os NÚMEROS e os TEXTOS */
-      width: '100%'
-    }} className="countdown-master-wrapper">
-
-     {/* 2. CRONÔMETRO COM PLURAL/SINGULAR AUTOMÁTICO */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '14px',
-        fontFamily: '"Bebas Neue", sans-serif',
-        fontSize: 'clamp(44px, 5vw, 64px)',
-        color: '#ffffff',
-        margin: '0',
-        letterSpacing: '1px',
-        lineHeight: 1
-      }} className="countdown-container">
-        <span>
-          {String(timeLeft.dias).padStart(2, '0')}
-          <span style={{ color: '#ffffff', fontSize: '0.5em', marginLeft: '3px' }}>
-            {timeLeft.dias === 1 ? 'Dia' : 'Dias'}
-          </span>
-        </span>
-        
-        <span>
-          {String(timeLeft.horas).padStart(2, '0')}
-          <span style={{ color: '#ffffff', fontSize: '0.5em', marginLeft: '3px' }}>
-            {timeLeft.horas === 1 ? 'Hora' : 'Horas'}
-          </span>
-        </span>
-        
-        <span>
-          {String(timeLeft.minutos).padStart(2, '0')}
-          <span style={{ color: '#ffffff', fontSize: '0.5em', marginLeft: '3px' }}>
-            {timeLeft.minutos === 1 ? 'Minuto' : 'Minutos'}
-          </span>
-        </span>
-        
-        <span>
-          {String(timeLeft.segundos).padStart(2, '0')}
-          <span style={{ color: '#ffffff', fontSize: '0.5em', marginLeft: '3px' }}>
-            {timeLeft.segundos === 1 ? 'Segundo' : 'Segundos'}
-          </span>
-        </span>
-      </div>
-
-      {/* CONTÊINER INTERNO SÓ COM OS TEXTOS */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        gap: '10px' /* ⬅️ Distância entre uma frase e outra */
-      }}>
-        {/* 3. TEXTO INDICADOR DO CRONÔMETRO */}
-        <small style={{ margin: 0, display: 'block' }}>
-          Até o início do evento.
-        </small>
-
-        {/* 4. TEXTO DE VAGAS LIMITADAS */}
-        <small style={{ margin: 0, display: 'block' }}>
-          Obrigada a todas as inscritas! Nos vemos no Centro de Informática da UFPE.
-        </small>
-      </div>
-
-    </div> {/* ⬅️ FIM DO CONTÊINER ÚNICO MESTRE */}
-
-    {/* 5. LOGO DO EVENTO */}
-    <img className="final-cta-logo" src={logoHackaWomanVertical} alt="HackaWoman" />
-  </div>
-</section>
+      <section className="final-cta section-pad" id="encerramento" data-scrollbar-section="orange">
+        <div className="cta-content">
+          <SectionTitle eyebrow="HackaWoman 2026" title="Obrigada a todas!" light />
+          <p>
+            Juntas, transformamos o ecossistema tech de Pernambuco. Foi uma honra ter vocês com a gente.
+          </p>
+          <img className="final-cta-logo" src={logoHackaWomanVertical} alt="HackaWoman" />
+        </div>
+      </section>
 
       <footer className="footer" data-scrollbar-section="orange">
         <div className="footer-main">
@@ -908,8 +707,8 @@ function App() {
           <nav className="footer-links" aria-label="Navegação do rodapé">
             <h2>Navegação</h2>
             <a href="#sobre">Sobre</a>
-            <a href="#pilares">Nossos pilares</a>
-            <a href="#programacao">Programação</a>
+            {/* <a href="#resultados">Resultados</a> */}
+            <a href="#galeria">Galeria</a>
             <a href="#parceiros">Parceiros</a>
           </nav>
           <div className="footer-contact">
@@ -924,15 +723,15 @@ function App() {
             </a>
           </div>
           <div className="footer-edital">
-  <h2>Edital</h2>
-  <a 
-    href="/edital.pdf" 
-    target="_blank" 
-    rel="noreferrer"
-  >
-    Acessar edital completo
-  </a>
-</div>
+            <h2>Edital</h2>
+            <a
+              href="/edital.pdf"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Acessar edital completo
+            </a>
+          </div>
         </div>
         <p className="footer-copy">
           © 2026 HackaWoman - Ligia (Liga Acadêmica de Inteligência Artificial da
