@@ -39,6 +39,7 @@ type AgendaDay = {
   weekday: string;
   note: string[];
   photos: GalleryPhoto[];
+  driveUrl: string;
 };
 
 // type Winner = {
@@ -142,6 +143,7 @@ const agenda: AgendaDay[] = [
     weekday: "Sex",
     note: ["Workshops", "Palestras", "Painéis"],
     photos: fotosDia1.map((src) => ({ src, alt: "Foto do evento — dia 1" })),
+    driveUrl: "https://drive.google.com/drive/folders/1lm5AzXk6oo2ve2SAP8nET3Xdj02vfwrr?usp=share_link",
   },
   {
     day: "04",
@@ -149,6 +151,7 @@ const agenda: AgendaDay[] = [
     weekday: "Sáb",
     note: ["Hackathon"],
     photos: fotosDia2.map((src) => ({ src, alt: "Foto do evento — dia 2" })),
+    driveUrl: "https://drive.google.com/drive/folders/1SyGiMAF2OdJKvXy0pflsxfBXUM1lGrWR?usp=share_link",
   },
 ];
 
@@ -177,6 +180,97 @@ function DecorSquares({ className, src }: { className: string; src: string }) {
       aria-hidden="true"
       draggable={false}
     />
+  );
+}
+
+const INTRO_LINES = [
+  "Obrigada a todas que",
+  "participaram dessa",
+  "experiência",
+  "maravilhosa",
+];
+const INTRO_FULL = INTRO_LINES.join("\n");
+const CHAR_DELAY = 100; // ms por caractere
+
+function HeroIntro({ onComplete }: { onComplete: () => void }) {
+  const [phase, setPhase] = useState<1 | 2 | 3>(1);
+  const [typed, setTyped] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const total = INTRO_FULL.length;
+
+  useEffect(() => {
+    // Digita caractere a caractere
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setTyped(i);
+      if (i >= total) clearInterval(interval);
+    }, CHAR_DELAY);
+
+    // Após terminar de digitar + pausa, começa a animação do retângulo
+    const t1 = setTimeout(() => {
+      setPhase(2);
+      videoRef.current?.play().catch(() => {});
+    }, total * CHAR_DELAY + 5000);
+
+    const video = videoRef.current;
+    const handleEnded = () => {
+      setPhase(3);
+      setTimeout(onComplete, 1400);
+    };
+    video?.addEventListener("ended", handleEnded);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(t1);
+      video?.removeEventListener("ended", handleEnded);
+    };
+  }, [onComplete, total]);
+
+  // Distribui os chars digitados pelas linhas
+  let remaining = typed;
+  const displayedLines = INTRO_LINES.map((line) => {
+    if (remaining <= 0) return "";
+    const slice = line.slice(0, remaining);
+    remaining = Math.max(0, remaining - line.length - 1); // -1 pelo \n
+    return slice;
+  });
+
+  // Índice da última linha com conteúdo (onde o cursor fica)
+  const cursorLineIdx = displayedLines.reduce((acc, l, i) => (l.length > 0 ? i : acc), 0);
+
+  return (
+    <>
+      <p className={`hero-intro-text hero-intro-text-p${phase}`}>
+        {INTRO_LINES.map((_, i) => (
+          <span key={i}>
+            {displayedLines[i]}
+            {i === cursorLineIdx && phase === 1 && (
+              <span className="hero-intro-cursor" aria-hidden="true" />
+            )}
+          </span>
+        ))}
+      </p>
+      <div className={`hero-intro hero-intro-p${phase}`} aria-hidden="true">
+        <video
+          ref={videoRef}
+          className="hero-intro-video"
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source src="/video/resumoHackawoman.mp4" type="video/mp4" />
+        </video>
+        {phase === 2 && (
+          <button
+            className="hero-intro-skip"
+            onClick={() => { setPhase(3); setTimeout(onComplete, 1400); }}
+          >
+            Pular vídeo
+          </button>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -213,53 +307,226 @@ function SectionTitle({
   );
 }
 
-function DaySlideshow({ photos }: { photos: GalleryPhoto[] }) {
-  const [current, setCurrent] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+// ── Polaroid ─────────────────────────────────────────────────────────────────
+// Coloque o PNG do frame em public/polaroid/frame.png
+// Ajuste `photo` depois de colocar o PNG: meça no Figma e divida pelos px totais do frame.
+//   ex: frame 900×1100px, área da foto em x=72, y=63, 756×756px → left:0.08, top:0.057, width:0.84, height:0.687
+const POLAROID_CONFIG = {
+  frameUrl: '/polaroid/frame.png',
+  photo: { left: 0.052, top: 0.058, width: 0.896, height: 0.745 },
+};
 
-  const startTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (photos.length <= 1) return;
-    timerRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % photos.length);
-    }, 10000);
-  }, [photos.length]);
+function loadImg(src: string): Promise<HTMLImageElement> {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+async function buildPolaroidUrl(photoSrc: string): Promise<string> {
+  const [photo, frame] = await Promise.all([loadImg(photoSrc), loadImg(POLAROID_CONFIG.frameUrl)]);
+  const W = frame.naturalWidth, H = frame.naturalHeight;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, W, H);
+  const { left, top, width, height } = POLAROID_CONFIG.photo;
+  const px = left * W, py = top * H, pw = width * W, ph = height * H;
+  const scale = Math.max(pw / photo.naturalWidth, ph / photo.naturalHeight);
+  const sw = pw / scale, sh = ph / scale;
+  const sx = (photo.naturalWidth - sw) / 2, sy = (photo.naturalHeight - sh) / 2;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
+  ctx.drawImage(photo, sx, sy, sw, sh, px, py, pw, ph);
+  ctx.restore();
+  ctx.drawImage(frame, 0, 0, W, H);
+  return canvas.toDataURL('image/png');
+}
+
+// ── Mosaic slots ──────────────────────────────────────────────────────────────
+const MOSAIC_SLOTS = [
+  { left: '9%',  top: '2%',  width: '23%', aspect: '3/4',   rotate: '-2deg',   z: 4, dir: 'l' },
+  { left: '28%', top: '0%',  width: '28%', aspect: '16/10', rotate: '1.5deg',  z: 3, dir: 'u' },
+  { left: '59%', top: '1%',  width: '17%', aspect: '3/4',   rotate: '2.5deg',  z: 2, dir: 'r' },
+  { left: '74%', top: '5%',  width: '25%', aspect: '4/3',   rotate: '-1deg',   z: 3, dir: 'r' },
+  { left: '-1%', top: '46%', width: '17%', aspect: '4/3',   rotate: '3deg',    z: 2, dir: 'l' },
+  { left: '16%', top: '43%', width: '33%', aspect: '3/2',   rotate: '-1.5deg', z: 5, dir: 'd' },
+  { left: '52%', top: '38%', width: '22%', aspect: '2/3',   rotate: '2deg',    z: 4, dir: 'd' },
+  { left: '76%', top: '50%', width: '22%', aspect: '4/3',   rotate: '-2.5deg', z: 3, dir: 'r' },
+  { left: '2%',  top: '7%',  width: '12%', aspect: '1/1',   rotate: '-3.5deg', z: 1, dir: 'u' },
+];
+
+// 2 em cima, 3 embaixo
+const MOBILE_MOSAIC_SLOTS = [
+  { left: '2%',  top: '2%',  width: '46%', aspect: '3/4',   rotate: '-3deg',   z: 2, dir: 'l' },
+  { left: '50%', top: '0%',  width: '48%', aspect: '4/3',   rotate: '2.5deg',  z: 3, dir: 'r' },
+  { left: '-2%', top: '52%', width: '38%', aspect: '4/3',   rotate: '3.5deg',  z: 3, dir: 'l' },
+  { left: '30%', top: '49%', width: '42%', aspect: '3/2',   rotate: '-2deg',   z: 4, dir: 'd' },
+  { left: '66%', top: '34%', width: '36%', aspect: '3/4',   rotate: '-3.5deg', z: 2, dir: 'r' },
+];
+
+function pickRandom(photos: GalleryPhoto[], count: number): GalleryPhoto[] {
+  return [...photos].sort(() => Math.random() - 0.5).slice(0, Math.min(count, photos.length));
+}
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return mobile;
+}
+
+function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
+  const isMobile = useIsMobile();
+  const slots = isMobile ? MOBILE_MOSAIC_SLOTS : MOSAIC_SLOTS;
+  const slotCount = slots.length;
+
+  const [visible, setVisible] = useState(() => pickRandom(photos, slotCount));
+  const [anim, setAnim] = useState<'idle' | 'out' | 'in'>('idle');
+  const [openedPhoto, setOpenedPhoto] = useState<GalleryPhoto | null>(null);
+  const animRef = useRef<'idle' | 'out' | 'in'>('idle');
+  const photosRef = useRef(photos);
+  const lastTapRef = useRef<{ src: string; time: number } | null>(null);
+  useEffect(() => { photosRef.current = photos; }, [photos]);
+
+  const slotCountRef = useRef(slotCount);
+  useEffect(() => { slotCountRef.current = slotCount; }, [slotCount]);
 
   useEffect(() => {
-    startTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [startTimer]);
+    setVisible(pickRandom(photos, slotCount));
+  }, [slotCount, photos]);
 
-  const go = (dir: 1 | -1) => {
-    setCurrent((prev) => (prev + dir + photos.length) % photos.length);
-    startTimer();
+  const shuffle = useCallback(() => {
+    if (animRef.current !== 'idle') return;
+    animRef.current = 'out';
+    setAnim('out');
+    setTimeout(() => {
+      setVisible(pickRandom(photosRef.current, slotCountRef.current));
+      animRef.current = 'in';
+      setAnim('in');
+      setTimeout(() => { animRef.current = 'idle'; setAnim('idle'); }, 850);
+    }, 620);
+  }, []);
+
+  useEffect(() => {
+    if (photos.length <= slotCount) return;
+    const t = setInterval(shuffle, 60000);
+    return () => clearInterval(t);
+  }, [shuffle, photos.length, slotCount]);
+
+  const handleTouchEnd = useCallback((photo: GalleryPhoto) => (e: React.TouchEvent) => {
+    const now = Date.now();
+    if (lastTapRef.current?.src === photo.src && now - lastTapRef.current.time < 350) {
+      e.preventDefault();
+      setOpenedPhoto(photo);
+    }
+    lastTapRef.current = { src: photo.src, time: now };
+  }, []);
+
+  if (photos.length === 0) return <div className="photo-mosaic photo-mosaic-empty" />;
+
+  return (
+    <>
+      <div className={`photo-mosaic${anim !== 'idle' ? ` photo-mosaic-${anim}` : ''}`}>
+        {visible.map((photo, i) => {
+          const s = slots[i];
+          return (
+            <div
+              key={photo.src}
+              className={`photo-mosaic-item mosaic-dir-${s.dir}`}
+              style={{
+                '--r': s.rotate,
+                left: s.left, top: s.top, width: s.width,
+                aspectRatio: s.aspect, zIndex: s.z,
+                animationDelay: anim === 'out' ? `${i * 45}ms` : `${i * 55}ms`,
+              } as React.CSSProperties}
+              onClick={!isMobile ? () => setOpenedPhoto(photo) : undefined}
+              onTouchEnd={isMobile ? handleTouchEnd(photo) : undefined}
+            >
+              <img src={photo.src} alt={photo.alt} loading="lazy" />
+            </div>
+          );
+        })}
+        <button
+          className="photo-mosaic-shuffle"
+          onClick={shuffle}
+          aria-label="Embaralhar fotos"
+          disabled={anim !== 'idle'}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="16 3 21 3 21 8"/>
+            <line x1="4" y1="20" x2="21" y2="3"/>
+            <polyline points="21 16 21 21 16 21"/>
+            <line x1="15" y1="15" x2="21" y2="21"/>
+          </svg>
+          Embaralhar
+        </button>
+      </div>
+      {openedPhoto && (
+        <PolaroidModal photo={openedPhoto} onClose={() => setOpenedPhoto(null)} />
+      )}
+    </>
+  );
+}
+
+function PolaroidModal({ photo, onClose }: { photo: GalleryPhoto; onClose: () => void }) {
+  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', esc);
+    buildPolaroidUrl(photo.src).then(setDataUrl).catch(() => setError(true));
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', esc);
+    };
+  }, [photo.src, onClose]);
+
+  const download = () => {
+    if (!dataUrl) return;
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'hackawoman-2026-polaroid.png';
+    a.click();
   };
 
   return (
-    <div className={photos.length === 0 ? "day-slideshow day-slideshow-empty" : "day-slideshow"}>
-      {photos.map((photo, index) => (
-        <img
-          key={photo.src}
-          className={index === current ? "day-slideshow-slide active" : "day-slideshow-slide"}
-          src={photo.src}
-          alt={photo.alt}
-        />
-      ))}
-      {photos.length > 1 && (
-        <>
-          <button className="day-slideshow-btn day-slideshow-btn-prev" onClick={() => go(-1)} aria-label="Foto anterior">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M12 5L7 10L12 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <button className="day-slideshow-btn day-slideshow-btn-next" onClick={() => go(1)} aria-label="Próxima foto">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M8 5L13 10L8 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <span className="day-slideshow-counter">{current + 1} / {photos.length}</span>
-        </>
-      )}
+    <div className="polaroid-overlay" onClick={onClose}>
+      <div className="polaroid-modal" onClick={e => e.stopPropagation()}>
+        <button className="polaroid-close" onClick={onClose} aria-label="Fechar">✕</button>
+        {!dataUrl && !error && (
+          <div className="polaroid-loading">Gerando polaroid…</div>
+        )}
+        {error && (
+          <div className="polaroid-error">
+            <img src={photo.src} alt={photo.alt} />
+            <p>Frame não encontrado em /polaroid/frame.png</p>
+          </div>
+        )}
+        {dataUrl && (
+          <>
+            <img className="polaroid-preview" src={dataUrl} alt="Foto polaroid" />
+            <button className="polaroid-download" onClick={download}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Baixar polaroid
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -309,12 +576,17 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
         </em>
       </div>
       <div className="agenda-day-gallery">
-        <DaySlideshow photos={day.photos} />
-        {day.photos.length > 0 && (
-          <button className="agenda-see-all" onClick={() => setIsModalOpen(true)}>
-            Ver todas
-          </button>
-        )}
+        <PhotoMosaic photos={day.photos} />
+        <div className="agenda-day-footer">
+          <a className="agenda-drive-link" href={day.driveUrl} target="_blank" rel="noreferrer">
+            Acessar Drive
+          </a>
+          {day.photos.length > 0 && (
+            <button className="agenda-see-all" onClick={() => setIsModalOpen(true)}>
+              Ver todas
+            </button>
+          )}
+        </div>
       </div>
       {isModalOpen && <PhotoModal photos={day.photos} onClose={() => setIsModalOpen(false)} />}
     </article>
@@ -322,6 +594,7 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
 }
 
 function App() {
+  const [introComplete, setIntroComplete] = useState(false);
   const [isTopbarVisible, setIsTopbarVisible] = useState(true);
   const anchorScrollHoldUntilRef = useRef(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -472,7 +745,7 @@ function App() {
   };
 
   return (
-    <main className={isMenuOpen ? "site menu-open" : "site"}>
+    <main className={["site", isMenuOpen && "menu-open", !introComplete && "intro-active"].filter(Boolean).join(" ")}>
       <header
         className={isTopbarVisible ? "topbar" : "topbar topbar-hidden"}
         onClick={handleTopbarAnchorClick}
@@ -524,18 +797,42 @@ function App() {
           <a className="edital-link" href="/edital.pdf" target="_blank" rel="noreferrer">
             Acessar edital
           </a>
+          <a className="nav-cta" href="#resultados">
+            <span>Ver ganhadoras</span>
+          </a>
         </div>
       </header>
 
       <section className="hero" id="home" data-scrollbar-section="orange">
+        {!introComplete && <HeroIntro onComplete={() => setIntroComplete(true)} />}
         <DecorSquares className="decor-hero-gray" src={decorCinza} />
         <DecorSquares className="decor-hero-gray-bottom" src={decorCinza2} />
         <div className="hero-content">
           <HeroLogo />
-          <p>Juntas, transformamos o ecossistema tech de Pernambuco.</p>
-          {/* <a className="button button-primary" href="#resultados">
-            <span>Ver resultados</span>
-          </a> */}
+          <svg className="hero-year" viewBox="0 0 800 160" aria-label="2026" focusable="false">
+            <defs>
+              <linearGradient id="year-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ff4b1f" />
+                <stop offset="100%" stopColor="#ff9068" />
+              </linearGradient>
+            </defs>
+            <text
+              x="400" y="148"
+              textAnchor="middle"
+              fill="none"
+              stroke="url(#year-grad)"
+              strokeWidth="3"
+              fontFamily="'Bebas Neue', Impact, Arial, sans-serif"
+              fontSize="290"
+              letterSpacing="-2"
+            >
+              2026
+            </text>
+          </svg>
+          <p className="hero-tagline">
+            Foi maravilhoso ter vocês nessa aventura<br />
+            Nos vemos no próximo HackaWoman!
+          </p>
           <a className="scroll-cue" href="#sobre" aria-label="Ir para a próxima seção">
             <span />
           </a>

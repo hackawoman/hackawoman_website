@@ -453,9 +453,53 @@ a {
   -webkit-text-fill-color: transparent;
   font-family: var(--font-logo);
   font-size: var(--hero-logo-size);
-  font-weight: 400;
+  font-weight: 300;
   line-height: 0.73;
   text-transform: lowercase;
+}
+
+/* 2026 em SVG com stroke gradiente */
+.hero-year {
+  display: block;
+  width: min(700px, 90vw);
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+  user-select: none;
+  margin-top: clamp(20px, 4svh, 56px);
+}
+
+/* Tagline pós-evento */
+.hero-tagline {
+  width: min(500px, 100%) !important;
+  text-transform: uppercase;
+  font-weight: 500 !important;
+  letter-spacing: 1.5px !important;
+  font-size: clamp(9px, 1.4vw, 17px) !important;
+  line-height: 1.7 !important;
+  text-align: center;
+}
+
+/* Botão outline branco */
+.button-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 48px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-size: clamp(16px, 1.4vw, 20px);
+  letter-spacing: 2px;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.button-outline:hover,
+.button-outline:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .hero .button {
@@ -1258,6 +1302,132 @@ a {
   right: 0;
 }
 
+/* ===== PHOTO MOSAIC ===== */
+
+/* ── Photo Mosaic ─────────────────────────────────────────── */
+.photo-mosaic {
+  position: relative;
+  width: 100%;
+  height: min(580px, 80vw);
+  margin-bottom: 48px;
+}
+
+@media (max-width: 768px) {
+  .photo-mosaic {
+    height: min(520px, 155vw);
+  }
+}
+
+.photo-mosaic-empty {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.photo-mosaic-item {
+  position: absolute;
+  overflow: hidden;
+  border: 5px solid #fff;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
+  transform: rotate(var(--r, 0deg));
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+.photo-mosaic-item:hover,
+.photo-mosaic-item:active {
+  transform: rotate(0deg) scale(1.06);
+  z-index: 20 !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.photo-mosaic-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Card exit keyframes ──────── */
+@keyframes mosaic-exit-l {
+  from { transform: rotate(var(--r, 0deg)); opacity: 1; }
+  to   { transform: rotate(var(--r, 0deg)) translate(-420px, -30px) rotate(-28deg) scale(0.75); opacity: 0; }
+}
+@keyframes mosaic-exit-r {
+  from { transform: rotate(var(--r, 0deg)); opacity: 1; }
+  to   { transform: rotate(var(--r, 0deg)) translate(420px, 20px) rotate(28deg) scale(0.75); opacity: 0; }
+}
+@keyframes mosaic-exit-u {
+  from { transform: rotate(var(--r, 0deg)); opacity: 1; }
+  to   { transform: rotate(var(--r, 0deg)) translate(15px, -400px) rotate(18deg) scale(0.75); opacity: 0; }
+}
+@keyframes mosaic-exit-d {
+  from { transform: rotate(var(--r, 0deg)); opacity: 1; }
+  to   { transform: rotate(var(--r, 0deg)) translate(-10px, 400px) rotate(-18deg) scale(0.75); opacity: 0; }
+}
+
+/* ── Card enter keyframes ──────── */
+@keyframes mosaic-enter-l {
+  from { transform: rotate(var(--r, 0deg)) translate(-420px, -30px) rotate(-28deg) scale(0.75); opacity: 0; }
+  to   { transform: rotate(var(--r, 0deg)); opacity: 1; }
+}
+@keyframes mosaic-enter-r {
+  from { transform: rotate(var(--r, 0deg)) translate(420px, 20px) rotate(28deg) scale(0.75); opacity: 0; }
+  to   { transform: rotate(var(--r, 0deg)); opacity: 1; }
+}
+@keyframes mosaic-enter-u {
+  from { transform: rotate(var(--r, 0deg)) translate(15px, -400px) rotate(18deg) scale(0.75); opacity: 0; }
+  to   { transform: rotate(var(--r, 0deg)); opacity: 1; }
+}
+@keyframes mosaic-enter-d {
+  from { transform: rotate(var(--r, 0deg)) translate(-10px, 400px) rotate(-18deg) scale(0.75); opacity: 0; }
+  to   { transform: rotate(var(--r, 0deg)); opacity: 1; }
+}
+
+/* ── Exit per slot ──────────── */
+.photo-mosaic-out .mosaic-dir-l { animation: mosaic-exit-l 0.42s ease-in both; }
+.photo-mosaic-out .mosaic-dir-r { animation: mosaic-exit-r 0.42s ease-in both; }
+.photo-mosaic-out .mosaic-dir-u { animation: mosaic-exit-u 0.42s ease-in both; }
+.photo-mosaic-out .mosaic-dir-d { animation: mosaic-exit-d 0.42s ease-in both; }
+
+/* ── Enter per slot ──────────── */
+.photo-mosaic-in .mosaic-dir-l { animation: mosaic-enter-l 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+.photo-mosaic-in .mosaic-dir-r { animation: mosaic-enter-r 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+.photo-mosaic-in .mosaic-dir-u { animation: mosaic-enter-u 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+.photo-mosaic-in .mosaic-dir-d { animation: mosaic-enter-d 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── Shuffle button ──────────── */
+.photo-mosaic-shuffle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 22px;
+  background: var(--gradient-hero);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.photo-mosaic-shuffle:hover:not(:disabled) {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.photo-mosaic-shuffle:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
 .day-slideshow {
   position: relative;
   width: 100%;
@@ -1293,6 +1463,28 @@ a {
   width: 100%;
 }
 
+.agenda-day-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.agenda-drive-link {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  transition: color 180ms ease;
+}
+
+.agenda-drive-link:hover,
+.agenda-drive-link:focus-visible {
+  color: var(--color-white);
+  outline: 0;
+}
+
 .agenda-see-all {
   border: 0;
   padding: 0;
@@ -1310,6 +1502,105 @@ a {
 .agenda-see-all:focus-visible {
   color: var(--color-white);
   outline: 0;
+}
+
+/* ── Polaroid modal ───────────────────────────────────────────────────────── */
+@keyframes polaroid-drop {
+  from { opacity: 0; transform: translateY(-28px) rotate(3deg) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) rotate(-1.5deg) scale(1); }
+}
+
+.polaroid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(15, 5, 20, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.polaroid-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: polaroid-drop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.polaroid-preview {
+  max-width: min(540px, 90vw);
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 20px 48px rgba(0,0,0,0.7));
+}
+
+.polaroid-download {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  background: var(--gradient-hero);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.polaroid-download:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transform: scale(1.04);
+}
+
+.polaroid-close {
+  position: absolute;
+  top: -52px;
+  right: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease;
+}
+
+.polaroid-close:hover { background: rgba(255,255,255,0.28); }
+
+.polaroid-loading {
+  color: rgba(255,255,255,0.7);
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.polaroid-error img {
+  max-width: min(320px, 80vw);
+  max-height: 50vh;
+  border-radius: 6px;
+}
+
+.polaroid-error p {
+  color: rgba(255,255,255,0.5);
+  font-family: var(--font-body);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .photo-modal-overlay {
@@ -2575,4 +2866,134 @@ span.button.cta-unavailable,
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
+}
+
+/* ===== HERO INTRO ANIMATION ===== */
+
+/* Texto laranja com efeito de digitação */
+.hero-intro-text {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.06em;
+  text-align: center;
+  color: #ff4b1f;
+  font-family: var(--font-heading);
+  font-size: clamp(4rem, 11vw, 11rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.hero-intro-text-p2,
+.hero-intro-text-p3 {
+  opacity: 0;
+}
+
+/* Cursor piscando */
+.hero-intro-cursor {
+  display: inline-block;
+  width: 4px;
+  height: 0.8em;
+  background: #ff4b1f;
+  margin-left: 6px;
+  vertical-align: middle;
+  border-radius: 2px;
+  animation: cursor-blink 0.75s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* O retângulo roxo — nasce do zero, cresce em dois estágios */
+.hero-intro {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  z-index: 10;
+  width: 0;
+  height: 0;
+  border: 3px solid transparent;
+  border-top-right-radius: clamp(190px, 22vw, 360px);
+  border-bottom-left-radius: clamp(180px, 30vw, 520px);
+  overflow: hidden;
+  background: var(--gradient-hero) padding-box, transparent border-box;
+  transition:
+    width 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    height 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-top-right-radius 1.2s ease,
+    border-bottom-left-radius 1.2s ease;
+}
+
+/* Fase 2: cresce para o tamanho do vídeo — bordas menores, stroke gradiente roxo */
+.hero-intro-p2 {
+  width: min(700px, 85vw);
+  height: min(820px, 95vh);
+  border-width: 5px;
+  border-top-right-radius: 48px;
+  border-bottom-left-radius: 48px;
+  background:
+    var(--gradient-hero) padding-box,
+    linear-gradient(205deg, #8b2fc9 0%, #5a1391 50%, #371a33 100%) border-box;
+}
+
+/* Fase 3: expande para preencher a hero inteira */
+.hero-intro-p3 {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-intro-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-intro-skip {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 8px 18px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hero-intro-skip:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* Hero background fica neutro enquanto o retângulo cresce */
+.intro-active .hero {
+  background: var(--color-section-gray);
+}
+
+/* Hero content escondido até a intro terminar */
+.intro-active .hero-content {
+  opacity: 0;
+}
+
+.hero-content {
+  transition: opacity 0.7s ease;
 }
