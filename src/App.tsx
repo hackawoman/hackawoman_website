@@ -268,7 +268,7 @@ function HeroIntro({ onComplete }: { onComplete: () => void }) {
           muted
           playsInline
           preload="auto"
-          src="/video/resumoHackawoman.mp4"
+          src={isMobile ? "/video/resumoHackawoman.mp4" : "/video/resumoHackawomanHorizontal.mp4"}
         />
         {phase === 2 && !isMobile && (
           <button
@@ -475,8 +475,26 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
             </div>
           );
         })}
+        {!isMobile && (
+          <button
+            className="photo-mosaic-shuffle"
+            onClick={shuffle}
+            aria-label="Embaralhar fotos"
+            disabled={anim !== 'idle'}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="16 3 21 3 21 8"/>
+              <line x1="4" y1="20" x2="21" y2="3"/>
+              <polyline points="21 16 21 21 16 21"/>
+              <line x1="15" y1="15" x2="21" y2="21"/>
+            </svg>
+            Embaralhar
+          </button>
+        )}
+      </div>
+      {isMobile && (
         <button
-          className="photo-mosaic-shuffle"
+          className="photo-mosaic-shuffle photo-mosaic-shuffle--mobile"
           onClick={shuffle}
           aria-label="Embaralhar fotos"
           disabled={anim !== 'idle'}
@@ -489,7 +507,7 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
           </svg>
           Embaralhar
         </button>
-      </div>
+      )}
       {openedPhoto && (
         <PolaroidModal photo={openedPhoto} onClose={() => setOpenedPhoto(null)} />
       )}
@@ -598,9 +616,6 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
       <div className="agenda-day-gallery">
         <PhotoMosaic photos={day.photos} />
         <div className="agenda-day-footer">
-          <a className="agenda-drive-link" href={day.driveUrl} target="_blank" rel="noreferrer">
-            Acessar Drive
-          </a>
         </div>
       </div>
       {isModalOpen && <PhotoModal photos={day.photos} onClose={() => setIsModalOpen(false)} />}
@@ -972,7 +987,15 @@ function App() {
       <section className="agenda section-pad" id="galeria" data-scrollbar-section="orange">
         <DecorSquares className="decor-agenda-orange" src={decorLaranja2} />
         <div className="inner">
-          <SectionTitle eyebrow="Galeria" title="Como foi o evento." light />
+          <SectionTitle eyebrow="Galeria" title="Nossas histórias." light />
+          <a
+            className="galeria-drive-btn"
+            href="https://drive.google.com/drive/folders/1vdOyGrpAHyoGiUPTjbhrWizTxuEVV8nW?usp=share_link"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Acessar Drive
+          </a>
           <div className="agenda-list">
             {agenda.map((day) => (
               <AgendaBlock day={day} key={day.day} />
