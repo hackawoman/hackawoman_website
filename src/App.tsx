@@ -251,6 +251,9 @@ function HeroIntro({ onComplete }: { onComplete: () => void }) {
           </span>
         ))}
       </p>
+      <div className={`hero-intro-bg hero-intro-bg-p${phase}`} aria-hidden="true">
+        <img src="/hero-bg/photo.jpeg" alt="" />
+      </div>
       <div className={`hero-intro hero-intro-p${phase}`} aria-hidden="true">
         <video
           ref={videoRef}
@@ -392,9 +395,9 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
   const [visible, setVisible] = useState(() => pickRandom(photos, slotCount));
   const [anim, setAnim] = useState<'idle' | 'out' | 'in'>('idle');
   const [openedPhoto, setOpenedPhoto] = useState<GalleryPhoto | null>(null);
+  const [selectedSrc, setSelectedSrc] = useState<string | null>(null);
   const animRef = useRef<'idle' | 'out' | 'in'>('idle');
   const photosRef = useRef(photos);
-  const lastTapRef = useRef<{ src: string; time: number } | null>(null);
   useEffect(() => { photosRef.current = photos; }, [photos]);
 
   const slotCountRef = useRef(slotCount);
@@ -408,6 +411,7 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
     if (animRef.current !== 'idle') return;
     animRef.current = 'out';
     setAnim('out');
+    setSelectedSrc(null);
     setTimeout(() => {
       setVisible(pickRandom(photosRef.current, slotCountRef.current));
       animRef.current = 'in';
@@ -422,15 +426,6 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
     return () => clearInterval(t);
   }, [shuffle, photos.length, slotCount]);
 
-  const handleTouchEnd = useCallback((photo: GalleryPhoto) => (e: React.TouchEvent) => {
-    const now = Date.now();
-    if (lastTapRef.current?.src === photo.src && now - lastTapRef.current.time < 350) {
-      e.preventDefault();
-      setOpenedPhoto(photo);
-    }
-    lastTapRef.current = { src: photo.src, time: now };
-  }, []);
-
   if (photos.length === 0) return <div className="photo-mosaic photo-mosaic-empty" />;
 
   return (
@@ -438,6 +433,7 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
       <div className={`photo-mosaic${anim !== 'idle' ? ` photo-mosaic-${anim}` : ''}`}>
         {visible.map((photo, i) => {
           const s = slots[i];
+          const isSelected = isMobile && selectedSrc === photo.src;
           return (
             <div
               key={photo.src}
@@ -445,13 +441,23 @@ function PhotoMosaic({ photos }: { photos: GalleryPhoto[] }) {
               style={{
                 '--r': s.rotate,
                 left: s.left, top: s.top, width: s.width,
-                aspectRatio: s.aspect, zIndex: s.z,
+                aspectRatio: s.aspect, zIndex: isSelected ? 25 : s.z,
                 animationDelay: anim === 'out' ? `${i * 45}ms` : `${i * 55}ms`,
               } as React.CSSProperties}
               onClick={!isMobile ? () => setOpenedPhoto(photo) : undefined}
-              onTouchEnd={isMobile ? handleTouchEnd(photo) : undefined}
+              onTouchEnd={isMobile ? () => setSelectedSrc(photo.src) : undefined}
             >
-              <img src={photo.src} alt={photo.alt} loading="lazy" />
+              <div className="photo-mosaic-img-wrap">
+                <img src={photo.src} alt={photo.alt} loading="lazy" />
+              </div>
+              {isSelected && (
+                <button
+                  className="mosaic-ver-foto"
+                  onClick={() => { setOpenedPhoto(photo); setSelectedSrc(null); }}
+                >
+                  Ver foto
+                </button>
+              )}
             </div>
           );
         })}
@@ -581,11 +587,6 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
           <a className="agenda-drive-link" href={day.driveUrl} target="_blank" rel="noreferrer">
             Acessar Drive
           </a>
-          {day.photos.length > 0 && (
-            <button className="agenda-see-all" onClick={() => setIsModalOpen(true)}>
-              Ver todas
-            </button>
-          )}
         </div>
       </div>
       {isModalOpen && <PhotoModal photos={day.photos} onClose={() => setIsModalOpen(false)} />}
@@ -797,9 +798,9 @@ function App() {
           <a className="edital-link" href="/edital.pdf" target="_blank" rel="noreferrer">
             Acessar edital
           </a>
-          <a className="nav-cta" href="#resultados">
+          {/* <a className="nav-cta" href="#resultados">
             <span>Ver ganhadoras</span>
-          </a>
+          </a> */}
         </div>
       </header>
 
