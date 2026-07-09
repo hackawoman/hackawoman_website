@@ -196,7 +196,9 @@ function HeroIntro({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [typed, setTyped] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isMobile = useIsMobile();
   const total = INTRO_FULL.length;
+
 
   useEffect(() => {
     // Digita caractere a caractere
@@ -210,7 +212,12 @@ function HeroIntro({ onComplete }: { onComplete: () => void }) {
     // Após terminar de digitar + pausa, começa a animação do retângulo
     const t1 = setTimeout(() => {
       setPhase(2);
-      videoRef.current?.play().catch(() => {});
+      const vid = videoRef.current;
+      if (vid) {
+        vid.muted = true;
+        vid.playsInline = true;
+        vid.play().catch(() => {});
+      }
     }, total * CHAR_DELAY + 5000);
 
     const video = videoRef.current;
@@ -261,10 +268,9 @@ function HeroIntro({ onComplete }: { onComplete: () => void }) {
           muted
           playsInline
           preload="auto"
-        >
-          <source src="/video/resumoHackawoman.mp4" type="video/mp4" />
-        </video>
-        {phase === 2 && (
+          src="/video/resumoHackawoman.mp4"
+        />
+        {phase === 2 && !isMobile && (
           <button
             className="hero-intro-skip"
             onClick={() => { setPhase(3); setTimeout(onComplete, 1400); }}
@@ -273,6 +279,14 @@ function HeroIntro({ onComplete }: { onComplete: () => void }) {
           </button>
         )}
       </div>
+      {phase === 2 && isMobile && (
+        <button
+          className="hero-intro-skip"
+          onClick={() => { setPhase(3); setTimeout(onComplete, 1400); }}
+        >
+          Pular vídeo
+        </button>
+      )}
     </>
   );
 }

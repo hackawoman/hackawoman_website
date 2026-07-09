@@ -71,6 +71,12 @@ html {
   scrollbar-width: thin;
 }
 
+@media (max-width: 768px) {
+  html, body {
+    overscroll-behavior-y: auto;
+  }
+}
+
 html[data-scrollbar-theme="orange"] {
   --scrollbar-thumb-solid: #ff4b1f;
   --scrollbar-thumb-gradient: var(--gradient-orange-scroll);
@@ -106,7 +112,7 @@ html[data-scrollbar-theme="purple"] {
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--color-dark);
+  background: var(--color-section-gray);
   overscroll-behavior-y: none;
 }
 
@@ -2906,33 +2912,36 @@ span.button.cta-unavailable,
 /* Texto laranja com efeito de digitação */
 /* Foto com blur atrás do vídeo — desktop only */
 .hero-intro-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 8;
-  overflow: hidden;
-  border-top-right-radius: clamp(190px, 22vw, 360px);
-  border-bottom-left-radius: clamp(180px, 30vw, 520px);
-  opacity: 0;
-  transition: opacity 0.8s ease;
-  pointer-events: none;
+  display: none;
 }
 
-.hero-intro-bg-p2,
-.hero-intro-bg-p3 {
-  opacity: 1;
-}
+@media (min-width: 769px) {
+  .hero-intro-bg {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    overflow: hidden;
+    border-top-right-radius: clamp(190px, 22vw, 360px);
+    border-bottom-left-radius: clamp(180px, 30vw, 520px);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+  }
 
-.hero-intro-bg img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(18px);
-  transform: scale(1.06);
-}
+  .hero-intro-bg-p2,
+  .hero-intro-bg-p3 {
+    opacity: 1;
+  }
 
-@media (max-width: 768px) {
-  .hero-intro-bg { display: none; }
+  .hero-intro-bg img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(18px);
+    transform: scale(1.06);
+  }
 }
 
 .hero-intro-text {
@@ -3009,21 +3018,35 @@ span.button.cta-unavailable,
   background: var(--gradient-hero);
 }
 
-@media (max-width: 768px) {
-  .hero-intro-p2 {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-    border-width: 0;
-  }
-}
-
 /* Fase 3: expande para preencher a hero inteira */
 .hero-intro-p3 {
   width: 100%;
   height: 100%;
+}
+
+/* Mobile: container com tamanho real e sem overflow:hidden (WKWebView/Chrome iOS bloqueia vídeo em
+   containers overflow:hidden) */
+@media (max-width: 768px) {
+  .hero-intro {
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    clip-path: inset(50%);
+    transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-intro-p2 {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    clip-path: inset(0%);
+  }
+
+  .hero-intro-p3 {
+    clip-path: inset(0%);
+  }
 }
 
 .hero-intro-video {
@@ -3060,11 +3083,11 @@ span.button.cta-unavailable,
 
 @media (max-width: 768px) {
   .hero-intro-skip {
-    bottom: 56px;
-    right: 20px;
-    transform: none;
+    position: absolute;
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    right: max(16px, env(safe-area-inset-right, 16px));
     font-size: 12px;
-    padding: 10px 26px;
+    padding: 8px 20px;
     background: rgba(0, 0, 0, 0.45);
     border-color: rgba(255, 255, 255, 0.5);
   }
