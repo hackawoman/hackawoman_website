@@ -42,19 +42,46 @@ type AgendaDay = {
   driveUrl: string;
 };
 
-// type Winner = {
-//   position: string;
-//   team: string;
-//   project: string;
-//   description?: string;
-// };
+type Winner = {
+  position: 1 | 2 | 3;
+  team: string;
+  project: string;
+  description: string;
+  category: string;
+  photo?: string;
+};
 
 type GalleryPhoto = {
   src: string;
   alt: string;
 };
 
-// const winners: Winner[] = [];
+const winners: Winner[] = [
+  {
+    position: 1,
+    team: "Manastech",
+    project: "MIA",
+    description: "Inteligência Artificial para reduzir a carga mental de mães trabalhadoras",
+    category: "Ver página",
+    photo: "/winners/1lugar.jpg",
+  },
+  {
+    position: 2,
+    team: "Nome da Equipe",
+    project: "Projeto Aurora",
+    description: "Proteção financeira para recomeços.",
+    category: "Ver página",
+    photo: "/winners/2lugar.jpeg",
+  },
+  {
+    position: 3,
+    team: "Sálvia",
+    project: "AEGIS",
+    description: "Arquivo Eletrônico com Garantia de Integridae e Segurança.",
+    category: "Ver página",
+    photo: "/winners/3lugar.jpg",
+  },
+];
 
 const fotosDia1 = Object.values(
   import.meta.glob("./assets/galeria/dia1/*", { eager: true, import: "default" })
@@ -596,6 +623,117 @@ function PhotoModal({ photos, onClose }: { photos: GalleryPhoto[]; onClose: () =
   );
 }
 
+const CONFETTI_COLORS = ['#ff4b1f', '#ff6535', '#ff7d50', '#ff9068', '#ffaa88', '#ffb59a'];
+
+function WinnersConfetti() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    type Particle = {
+      x: number; y: number; vx: number; vy: number;
+      size: number; color: string; rotation: number;
+      rotSpeed: number; shape: 0 | 1 | 2; alpha: number;
+    };
+
+    const count = 90;
+    const particles: Particle[] = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: Math.random() * 0.6 + 0.2,
+      size: Math.random() * 7 + 4,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.04,
+      shape: Math.floor(Math.random() * 3) as 0 | 1 | 2,
+      alpha: Math.random() * 0.4 + 0.35,
+    }));
+
+    let raf: number;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        if (p.shape === 0) {
+          ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        } else if (p.shape === 1) {
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
+        if (p.y > canvas.height + 10) { p.y = -10; p.x = Math.random() * canvas.width; }
+        if (p.x < -10) p.x = canvas.width + 10;
+        if (p.x > canvas.width + 10) p.x = -10;
+      }
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, []);
+
+  return <canvas ref={canvasRef} className="winners-confetti" aria-hidden="true" />;
+}
+
+function WinnerCard({ winner }: { winner: Winner }) {
+  const p = winner.position;
+  return (
+    <article className={`winner-card winner-card-${p}`}>
+      {p === 1 && (
+        <img src="/winners/tagCampeas.png" className="winner-campeas-tag" alt="Campeãs" />
+      )}
+      <div className={`winner-img winner-img-${p}`}>
+        {winner.photo
+          ? <img src={winner.photo} alt={`Equipe ${winner.team}`} />
+          : <div className="winner-img-placeholder" />}
+      </div>
+      <div className={`winner-badge winner-badge-${p}`}>
+        <img
+          className="winner-badge-bg"
+          src={`/winners/circulo${p === 1 ? 'Primeiro' : p === 2 ? 'Segundo' : 'Terceiro'}.png`}
+          alt=""
+          aria-hidden="true"
+        />
+        <span className="winner-pos-num">{p}º</span>
+        {p <= 3 && <span className="winner-pos-label">LUGAR</span>}
+      </div>
+      <div className="winner-divider" />
+      <div className="winner-team-block">
+        <p className="winner-equipe">EQUIPE</p>
+        <h3 className={`winner-name winner-name-${p}`}>{winner.team}</h3>
+      </div>
+      <p className="winner-desc">
+        <strong>{winner.project}</strong> – {winner.description}
+      </p>
+      <span className={`winner-tag winner-tag-${p}`}>{winner.category}</span>
+    </article>
+  );
+}
+
 function AgendaBlock({ day }: { day: AgendaDay }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -806,7 +944,7 @@ function App() {
 
         <nav className={`nav ${isMenuOpen ? "active" : ""}`} aria-label="Navegação principal">
           <a href="#sobre" onClick={() => setIsMenuOpen(false)}>Sobre</a>
-          {/* <a href="#resultados" onClick={() => setIsMenuOpen(false)}>Resultados</a> */}
+          <a href="#resultados" onClick={() => setIsMenuOpen(false)}>Resultados</a>
           <a href="#galeria" onClick={() => setIsMenuOpen(false)}>Galeria</a>
           <a href="#parceiros" onClick={() => setIsMenuOpen(false)}>Parceiros</a>
 
@@ -866,6 +1004,29 @@ function App() {
           <a className="scroll-cue" href="#sobre" aria-label="Ir para a próxima seção">
             <span />
           </a>
+        </div>
+      </section>
+
+      <section className="winners section-pad" id="resultados" data-scrollbar-section="purple">
+        <WinnersConfetti />
+        <img src="/winners/ellipseLeft.svg" className="winners-ellipse winners-ellipse-left" alt="" aria-hidden="true" />
+        <img src="/winners/ellipseRight.svg" className="winners-ellipse winners-ellipse-right" alt="" aria-hidden="true" />
+        <div className="inner">
+          <div className="winners-header">
+            <div className="winners-title-group">
+              <p className="winners-eyebrow">HACKAWOMAN 2026</p>
+              <h2 className="winners-title">Resultado Final</h2>
+            </div>
+          </div>
+          <div className="winners-podium">
+            <img src="/winners/vencedorasStroke.svg" className="winners-vencedoras-bg" alt="" aria-hidden="true" />
+            {([2, 1, 3] as const).map(pos => (
+              <WinnerCard key={pos} winner={winners.find(w => w.position === pos)!} />
+            ))}
+          </div>
+          <p className="winners-subtitle">
+            Conheça as equipes que mais se destacaram no desafio e vão representar o que há de melhor em inovação, tecnologia e impacto social.
+          </p>
         </div>
       </section>
 
@@ -933,24 +1094,6 @@ function App() {
           </article>
         ))}
       </section>
-
-      {/* <section className="results section-pad" id="resultados" data-scrollbar-section="purple">
-        <div className="inner">
-          <SectionTitle eyebrow="Hackathon 2026" title="Resultados." />
-          <div className="results-grid">
-            {winners.map((winner) => (
-              <article className="result-card" key={winner.position}>
-                <span className="result-position">{winner.position}</span>
-                <h3>{winner.team}</h3>
-                <p>{winner.project}</p>
-                {winner.description ? (
-                  <p className="result-description">{winner.description}</p>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       <section className="pillars section-pad" id="pilares" data-scrollbar-section="purple">
         <div className="inner">
