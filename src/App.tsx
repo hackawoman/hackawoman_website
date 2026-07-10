@@ -67,7 +67,7 @@ const winners: Winner[] = [
   },
   {
     position: 2,
-    team: "Nome da Equipe",
+    team: "Aurora",
     project: "Projeto Aurora",
     description: "Proteção financeira para recomeços.",
     category: "Ver página",
