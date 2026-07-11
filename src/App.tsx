@@ -618,7 +618,7 @@ function PolaroidModal({ photo, onClose }: { photo: GalleryPhoto; onClose: () =>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Baixar polaroid
+              Baixar imagem
             </button>
           </>
         )}
@@ -845,7 +845,7 @@ function WinnerModal({ winner, onClose }: { winner: Winner; onClose: () => void 
           <img src={groupPhoto} alt={winner.team} />
           <div className="wm-polaroid-footer">
             <p className="wm-polaroid-team">{winner.team}</p>
-            <a href={groupPhoto} download={`${winner.team}.jpg`} className="wm-polaroid-download">&#8595; Download</a>
+            <a href={groupPhoto} download={`${winner.team}.jpg`} className="wm-polaroid-download">Baixar imagem</a>
           </div>
         </div>
       </div>,
@@ -925,6 +925,9 @@ function AgendaBlock({ day }: { day: AgendaDay }) {
 function App() {
   const [introComplete, setIntroComplete] = useState(false);
   const [isTopbarVisible, setIsTopbarVisible] = useState(true);
+  const [activeNavSection, setActiveNavSection] = useState<string>('');
+  const [indicatorStyle, setIndicatorStyle] = useState<{left: number; width: number} | null>(null);
+  const navRef = useRef<HTMLElement>(null);
   const anchorScrollHoldUntilRef = useRef(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -1056,6 +1059,30 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const NAV_IDS = ['resultados', 'sobre', 'galeria', 'parceiros'];
+
+    const updateActiveNav = () => {
+      const sections = NAV_IDS.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+      const probe = 80;
+      const active = [...sections].reverse().find((s: HTMLElement) => s.getBoundingClientRect().top <= probe);
+      setActiveNavSection(active?.id ?? '');
+    };
+
+    updateActiveNav();
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    return () => window.removeEventListener('scroll', updateActiveNav);
+  }, []);
+
+  useEffect(() => {
+    if (!navRef.current || !activeNavSection) { setIndicatorStyle(null); return; }
+    const link = navRef.current.querySelector<HTMLElement>(`a[href="#${activeNavSection}"]`);
+    if (!link) { setIndicatorStyle(null); return; }
+    const navRect = navRef.current.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    setIndicatorStyle({ left: linkRect.left - navRect.left, width: linkRect.width });
+  }, [activeNavSection]);
+
   const handleTopbarAnchorClick = (event: MouseEvent<HTMLElement>) => {
     const target = event.target;
 
@@ -1103,11 +1130,13 @@ function App() {
           />
         ) : null}
 
-        <nav className={`nav ${isMenuOpen ? "active" : ""}`} aria-label="Navegação principal">
-          <a href="#sobre" onClick={() => setIsMenuOpen(false)}>Sobre</a>
-          <a href="#resultados" onClick={() => setIsMenuOpen(false)}>Resultados</a>
-          <a href="#galeria" onClick={() => setIsMenuOpen(false)}>Galeria</a>
-          <a href="#parceiros" onClick={() => setIsMenuOpen(false)}>Parceiros</a>
+        <nav ref={navRef} className={`nav ${isMenuOpen ? "active" : ""}`} aria-label="Navegação principal">
+          {['resultados','sobre','galeria','parceiros'].map(id => (
+            <a key={id} href={`#${id}`} onClick={() => setIsMenuOpen(false)}>
+              {id.charAt(0).toUpperCase() + id.slice(1)}
+            </a>
+          ))}
+          <span className="nav-indicator" style={indicatorStyle ? { left: indicatorStyle.left, width: indicatorStyle.width, opacity: 1 } : { opacity: 0 }} />
 
           <div className="mobile-only sidebar-actions">
             <a
@@ -1119,6 +1148,13 @@ function App() {
             >
               Acessar edital
             </a>
+            {/* <a
+              className="nav-cta"
+              href="#resultados"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <span>Ver vencedoras</span>
+            </a> */}
           </div>
         </nav>
 
@@ -1127,7 +1163,7 @@ function App() {
             Acessar edital
           </a>
           {/* <a className="nav-cta" href="#resultados">
-            <span>Ver ganhadoras</span>
+            <span>Ver vencedoras</span>
           </a> */}
         </div>
       </header>
@@ -1346,7 +1382,7 @@ function App() {
           <nav className="footer-links" aria-label="Navegação do rodapé">
             <h2>Navegação</h2>
             <a href="#sobre">Sobre</a>
-            {/* <a href="#resultados">Resultados</a> */}
+            <a href="#resultados">Resultados</a>
             <a href="#galeria">Galeria</a>
             <a href="#parceiros">Parceiros</a>
           </nav>
